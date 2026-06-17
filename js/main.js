@@ -2,7 +2,9 @@
  * main.js
  * Entry point for index.html — Opportunity Discovery page.
  * Coordinates API, filters, sorting, pagination, and dynamic card rendering.
+ * Uses a debounced search input to optimize performance.
  */
+
 
 import { fetchOpportunities } from './api.js';
 import { renderOpportunityGrid, showLoading, showEmptyState, showStatusMessage, clearStatusMessage } from './ui.js';
