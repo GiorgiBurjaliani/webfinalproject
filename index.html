@@ -1,50 +1,150 @@
 <!DOCTYPE html>
-<html lang="ka">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>პროექტის სახელი</title>
+  <meta name="description" content="Discover hackathons, technology camps, competitions, bootcamps, and more opportunities for students and young professionals.">
+  <title>OpportunityHub — Discover Hackathons, Camps &amp; Challenges</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <header>
-    <nav>
-      <span class="nav__logo">პროექტის სახელი</span>
-      <div class="nav__links">
-        <a href="index.html">ძიება</a>
-        <a href="saved.html">შენახული</a>
-      </div>
-      <div class="nav__actions">
-        <span id="nav-user"></span>
-        <button id="logout-btn" type="button">გასვლა</button>
-      </div>
-    </nav>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a href="index.html" class="site-header__logo" aria-label="OpportunityHub — go to home page">
+        <span class="site-header__logo-icon" aria-hidden="true">◈</span>
+        OpportunityHub
+      </a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <ul class="site-nav__list">
+          <li><a href="index.html" class="site-nav__link site-nav__link--active" aria-current="page">Opportunities</a></li>
+          <li><a href="saved.html" class="site-nav__link">Saved</a></li>
+          <li><a href="submit.html" class="site-nav__link">Suggest</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
-  <main>
+  <main id="main-content">
 
-    <!-- საძიებო / ფილტრის ფორმა -->
-    <section>
-      <form id="search-form">
-        <!-- დაამატე input ველები აქ (სულ მცირე 3 განსხვავებული ტიპი) -->
-        <button type="submit">ძიება</button>
+    <section class="page-intro" aria-labelledby="page-intro-heading">
+      <div class="page-intro__inner">
+        <h1 id="page-intro-heading" class="page-intro__title">Discover Opportunities</h1>
+        <p class="page-intro__tagline">Hackathons, Camps &amp; Challenges — find your next step.</p>
+        <p class="page-intro__desc">Browse real opportunities for students and young professionals: hackathons, technology camps, AI programs, competitions, bootcamps, workshops, conferences, and more.</p>
+      </div>
+    </section>
+
+    <section class="search-section" aria-labelledby="search-section-heading">
+      <h2 id="search-section-heading" class="visually-hidden">Search and filter opportunities</h2>
+      <form id="search-form" class="opportunity-search" novalidate aria-label="Search and filter opportunities">
+        <div class="opportunity-search__row">
+          <div class="opportunity-search__field">
+            <label for="search-input" class="opportunity-search__label">Search</label>
+            <input
+              id="search-input"
+              type="search"
+              name="search"
+              class="opportunity-search__input"
+              placeholder="e.g. hackathon, AI camp, startup..."
+              minlength="2"
+              maxlength="60"
+              autocomplete="off"
+              aria-label="Search opportunities by keyword"
+            >
+          </div>
+          <div class="opportunity-search__field">
+            <label for="category-select" class="opportunity-search__label">Category</label>
+            <select id="category-select" name="category" class="opportunity-search__select" aria-label="Filter by category">
+              <option value="all">All Categories</option>
+              <option value="hackathon">Hackathon</option>
+              <option value="camp">Technology Camp</option>
+              <option value="ai-camp">AI Camp</option>
+              <option value="competition">Competition</option>
+              <option value="startup-challenge">Startup Challenge</option>
+              <option value="bootcamp">Bootcamp</option>
+              <option value="workshop">Workshop</option>
+              <option value="conference">Conference</option>
+              <option value="youth-program">Youth Program</option>
+            </select>
+          </div>
+          <div class="opportunity-search__field">
+            <label for="format-select" class="opportunity-search__label">Format</label>
+            <select id="format-select" name="format" class="opportunity-search__select" aria-label="Filter by format">
+              <option value="all">All Formats</option>
+              <option value="online">Online</option>
+              <option value="in-person">In-person</option>
+              <option value="hybrid">Hybrid</option>
+            </select>
+          </div>
+          <div class="opportunity-search__field">
+            <label for="funding-select" class="opportunity-search__label">Funding</label>
+            <select id="funding-select" name="funding" class="opportunity-search__select" aria-label="Filter by funding type">
+              <option value="all">All Funding</option>
+              <option value="free">Free</option>
+              <option value="paid">Paid</option>
+              <option value="fully-funded">Fully Funded</option>
+              <option value="partially-funded">Partially Funded</option>
+            </select>
+          </div>
+          <div class="opportunity-search__field">
+            <label for="region-select" class="opportunity-search__label">Region</label>
+            <select id="region-select" name="region" class="opportunity-search__select" aria-label="Filter by region">
+              <option value="all">All Regions</option>
+              <option value="georgia">Georgia</option>
+              <option value="europe">Europe</option>
+              <option value="worldwide">Worldwide</option>
+              <option value="online">Online</option>
+            </select>
+          </div>
+          <div class="opportunity-search__field">
+            <label for="sort-select" class="opportunity-search__label">Sort by</label>
+            <select id="sort-select" name="sort" class="opportunity-search__select" aria-label="Sort opportunities">
+              <option value="deadline-asc">Deadline: nearest first</option>
+              <option value="deadline-desc">Deadline: latest first</option>
+              <option value="recent">Recently published</option>
+              <option value="title-asc">Title: A–Z</option>
+            </select>
+          </div>
+        </div>
+        <div class="opportunity-search__actions">
+          <button type="button" id="reset-filters-btn" class="btn btn--secondary">Reset filters</button>
+        </div>
       </form>
     </section>
 
-    <!-- ჩატვირთვის და შეცდომის მდგომარეობები -->
-    <p id="loading-msg" hidden>იტვირთება…</p>
-    <p id="error-msg" hidden></p>
+    <section class="results-section" aria-labelledby="results-heading">
+      <h2 id="results-heading" class="visually-hidden">Opportunity results</h2>
 
-    <!-- დინამიურად შექმნილი ბარათები აქ განთავსდება -->
-    <section>
-      <div id="results-grid"></div>
+      <div
+        id="status-message"
+        class="status-message"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        hidden
+      ></div>
+
+      <div id="opportunity-grid" class="opportunity-grid" aria-label="Opportunities list"></div>
+
+      <div id="load-more-container" class="load-more-container" hidden>
+        <button id="load-more-btn" type="button" class="btn btn--primary">Load more opportunities</button>
+      </div>
     </section>
 
   </main>
 
-  <footer>
-    <!-- footer-ის შიგთავსი -->
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p class="site-footer__copy">
+        OpportunityHub — opportunities sourced via <a href="https://docs.github.com/en/rest" target="_blank" rel="noopener noreferrer">GitHub Issues API</a>.
+      </p>
+      <nav class="site-footer__nav" aria-label="Footer navigation">
+        <a href="index.html">Opportunities</a>
+        <a href="saved.html">Saved</a>
+        <a href="submit.html">Suggest</a>
+      </nav>
+    </div>
   </footer>
 
   <script type="module" src="js/main.js"></script>

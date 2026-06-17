@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Suggest a hackathon, camp, competition, or other opportunity to be listed on OpportunityHub.">
+  <title>Suggest an Opportunity — OpportunityHub</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a href="index.html" class="site-header__logo" aria-label="OpportunityHub — go to home page">
+        <span class="site-header__logo-icon" aria-hidden="true">◈</span>
+        OpportunityHub
+      </a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <ul class="site-nav__list">
+          <li><a href="index.html" class="site-nav__link">Opportunities</a></li>
+          <li><a href="saved.html" class="site-nav__link">Saved</a></li>
+          <li><a href="submit.html" class="site-nav__link site-nav__link--active" aria-current="page">Suggest</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+
+    <section class="page-intro page-intro--compact" aria-labelledby="submit-page-heading">
+      <div class="page-intro__inner">
+        <h1 id="submit-page-heading" class="page-intro__title">Suggest an Opportunity</h1>
+        <p class="page-intro__desc">Know of a hackathon, camp, or challenge that students should know about? Submit it here and we will review it.</p>
+      </div>
+    </section>
+
+    <section class="submit-section" aria-labelledby="submit-form-heading">
+      <h2 id="submit-form-heading" class="visually-hidden">Suggestion form</h2>
+
+      <div
+        id="submit-status"
+        class="status-message"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        hidden
+      ></div>
+
+      <div id="submit-success" class="success-panel" hidden>
+        <h2 class="success-panel__title">Thank you for your suggestion!</h2>
+        <p class="success-panel__desc">Your suggestion has been saved locally. In the future, suggestions can be submitted to our repository for review.</p>
+        <button id="submit-another-btn" type="button" class="btn btn--primary">Suggest another</button>
+      </div>
+
+      <form id="suggestion-form" class="suggestion-form" novalidate aria-label="Suggest an opportunity">
+
+        <div id="form-error-summary" class="form-error-summary" role="alert" aria-live="assertive" hidden>
+          <h3 class="form-error-summary__title">Please correct the following errors:</h3>
+          <ul id="form-error-list" class="form-error-summary__list"></ul>
+        </div>
+
+        <fieldset class="form-section">
+          <legend class="form-section__title">Basic Information</legend>
+
+          <div class="form-field">
+            <label for="field-title" class="form-field__label">
+              Opportunity title <span class="form-field__required" aria-label="required">*</span>
+            </label>
+            <input
+              id="field-title"
+              type="text"
+              name="title"
+              class="form-field__input"
+              required
+              minlength="5"
+              maxlength="120"
+              placeholder="e.g. Global AI Student Hackathon 2025"
+              autocomplete="off"
+            >
+            <p id="field-title-error" class="form-field__error" aria-live="polite" hidden></p>
+          </div>
+
+          <div class="form-field">
+            <label for="field-organizer" class="form-field__label">
+              Organizer / Institution <span class="form-field__required" aria-label="required">*</span>
+            </label>
+            <input
+              id="field-organizer"
+              type="text"
+              name="organizer"
+              class="form-field__input"
+              required
+              minlength="2"
+              maxlength="100"
+              placeholder="e.g. Google, MIT, EU Commission"
+              autocomplete="organization"
+            >
+            <p id="field-organizer-error" class="form-field__error" aria-live="polite" hidden></p>
+          </div>
+
+          <div class="form-field">
+            <label for="field-email" class="form-field__label">
+              Your email <span class="form-field__required" aria-label="required">*</span>
+            </label>
+            <input
+              id="field-email"
+              type="email"
+              name="email"
+              class="form-field__input"
+              required
+              maxlength="100"
+              placeholder="you@example.com"
+              autocomplete="email"
+            >
+            <p id="field-email-error" class="form-field__error" aria-live="polite" hidden></p>
+          </div>
+
+          <div class="form-field">
+            <label for="field-category" class="form-field__label">
+              Category <span class="form-field__required" aria-label="required">*</span>
+            </label>
+            <select id="field-category" name="category" class="form-field__select" required>
+              <option value="">— Select a category —</option>
+              <option value="hackathon">Hackathon</option>
+              <option value="camp">Technology Camp</option>
+              <option value="ai-camp">AI Camp</option>
+              <option value="competition">Competition</option>
+              <option value="startup-challenge">Startup Challenge</option>
+              <option value="bootcamp">Bootcamp</option>
+              <option value="workshop">Workshop</option>
+              <option value="conference">Conference</option>
+              <option value="youth-program">Youth Program</option>
+            </select>
+            <p id="field-category-error" class="form-field__error" aria-live="polite" hidden></p>
+          </div>
+
+        </fieldset>
+
+        <fieldset class="form-section">
+          <legend class="form-section__title">Format</legend>
+
+          <div class="form-field form-field--radio-group" role="group" aria-labelledby="format-group-label">
+            <span id="format-group-label" class="form-field__label">
+              Event format <span class="form-field__required" aria-label="required">*</span>
+            </span>
+            <div class="form-field__radio-options">
+              <label class="form-field__radio-label">
+                <input type="radio" name="format" value="online" class="form-field__radio"> Online
+              </label>
+              <label class="form-field__radio-label">
+                <input type="radio" name="format" value="in-person" class="form-field__radio"> In-person
+              </label>
+              <label class="form-field__radio-label">
+                <input type="radio" name="format" value="hybrid" class="form-field__radio"> Hybrid
+              </label>
+            </div>
+            <p id="field-format-error" class="form-field__error" aria-live="polite" hidden></p>
+          </div>
+
+        </fieldset>
+
+        <fieldset class="form-section">
+          <legend class="form-section__title">Details</legend>
+
+          <div class="form-field">
+            <label for="field-funding" class="form-field__label">
+              Funding type <span class="form-field__required" aria-label="required">*</span>
+            </label>
+            <select id="field-funding" name="funding" class="form-field__select" required>
+              <option value="">— Select funding type —</option>
+              <option value="free">Free</option>
+              <option value="paid">Paid</option>
+              <option value="fully-funded">Fully Funded</option>
+              <option value="partially-funded">Partially Funded</option>
+            </select>
+            <p id="field-funding-error" class="form-field__error" aria-live="polite" hidden></p>
+          </div>
+
+          <div class="form-field">
+            <label for="field-deadline" class="form-field__label">
+              Application deadline
+            </label>
+            <input
+              id="field-deadline"
+              type="date"
+              name="deadline"
+              class="form-field__input"
+            >
+            <p id="field-deadline-error" class="form-field__error" aria-live="polite" hidden></p>
+          </div>
+
+          <div class="form-field">
+            <label for="field-url" class="form-field__label">
+              Official URL <span class="form-field__required" aria-label="required">*</span>
+            </label>
+            <input
+              id="field-url"
+              type="url"
+              name="url"
+              class="form-field__input"
+              required
+              maxlength="300"
+              placeholder="https://example.com/opportunity"
+            >
+            <p id="field-url-error" class="form-field__error" aria-live="polite" hidden></p>
+          </div>
+
+          <div class="form-field">
+            <label for="field-location" class="form-field__label">City / Location</label>
+            <input
+              id="field-location"
+              type="text"
+              name="location"
+              class="form-field__input"
+              maxlength="100"
+              placeholder="e.g. Tbilisi, Georgia or Online"
+              autocomplete="off"
+            >
+          </div>
+
+        </fieldset>
+
+        <fieldset class="form-section">
+          <legend class="form-section__title">Benefits</legend>
+
+          <div class="form-field form-field--checkbox-group">
+            <span class="form-field__label">What does this opportunity offer?</span>
+            <div class="form-field__checkbox-options">
+              <label class="form-field__checkbox-label">
+                <input type="checkbox" name="benefits" value="certificate" class="form-field__checkbox"> Certificate
+              </label>
+              <label class="form-field__checkbox-label">
+                <input type="checkbox" name="benefits" value="cash-prize" class="form-field__checkbox"> Cash prize
+              </label>
+              <label class="form-field__checkbox-label">
+                <input type="checkbox" name="benefits" value="mentorship" class="form-field__checkbox"> Mentorship
+              </label>
+              <label class="form-field__checkbox-label">
+                <input type="checkbox" name="benefits" value="networking" class="form-field__checkbox"> Networking
+              </label>
+              <label class="form-field__checkbox-label">
+                <input type="checkbox" name="benefits" value="travel-grant" class="form-field__checkbox"> Travel grant
+              </label>
+              <label class="form-field__checkbox-label">
+                <input type="checkbox" name="benefits" value="internship" class="form-field__checkbox"> Internship opportunity
+              </label>
+            </div>
+          </div>
+
+        </fieldset>
+
+        <fieldset class="form-section">
+          <legend class="form-section__title">Description</legend>
+
+          <div class="form-field">
+            <label for="field-description" class="form-field__label">
+              Description <span class="form-field__required" aria-label="required">*</span>
+            </label>
+            <textarea
+              id="field-description"
+              name="description"
+              class="form-field__textarea"
+              required
+              minlength="30"
+              maxlength="2000"
+              rows="6"
+              placeholder="Describe the opportunity: what it is, who it is for, what participants will do..."
+            ></textarea>
+            <p id="field-description-error" class="form-field__error" aria-live="polite" hidden></p>
+          </div>
+
+        </fieldset>
+
+        <div class="suggestion-form__actions">
+          <button type="submit" id="submit-btn" class="btn btn--primary">Submit suggestion</button>
+          <button type="reset" class="btn btn--secondary">Clear form</button>
+        </div>
+
+      </form>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p class="site-footer__copy">
+        OpportunityHub — opportunities sourced via <a href="https://docs.github.com/en/rest" target="_blank" rel="noopener noreferrer">GitHub Issues API</a>.
+      </p>
+      <nav class="site-footer__nav" aria-label="Footer navigation">
+        <a href="index.html">Opportunities</a>
+        <a href="saved.html">Saved</a>
+        <a href="submit.html">Suggest</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script type="module" src="js/submit.js"></script>
+</body>
+</html>

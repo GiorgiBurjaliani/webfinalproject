@@ -1,39 +1,88 @@
 <!DOCTYPE html>
-<html lang="ka">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>შენახული — პროექტის სახელი</title>
+  <meta name="description" content="Your saved opportunities on OpportunityHub. Track your applications and manage your progress.">
+  <title>Saved Opportunities — OpportunityHub</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <header>
-    <nav>
-      <span class="nav__logo">პროექტის სახელი</span>
-      <div class="nav__links">
-        <a href="index.html">ძიება</a>
-        <a href="saved.html">შენახული</a>
-      </div>
-      <div class="nav__actions">
-        <span id="nav-user"></span>
-        <button id="logout-btn" type="button">გასვლა</button>
-      </div>
-    </nav>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a href="index.html" class="site-header__logo" aria-label="OpportunityHub — go to home page">
+        <span class="site-header__logo-icon" aria-hidden="true">◈</span>
+        OpportunityHub
+      </a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <ul class="site-nav__list">
+          <li><a href="index.html" class="site-nav__link">Opportunities</a></li>
+          <li><a href="saved.html" class="site-nav__link site-nav__link--active" aria-current="page">Saved</a></li>
+          <li><a href="submit.html" class="site-nav__link">Suggest</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
-  <main>
+  <main id="main-content">
 
-    <section>
-      <h2>შენახული ელემენტები</h2>
-      <p id="saved-empty" hidden>ჯერ არაფერია შენახული.</p>
-      <div id="saved-grid"></div>
+    <section class="page-intro page-intro--compact" aria-labelledby="saved-page-heading">
+      <div class="page-intro__inner">
+        <h1 id="saved-page-heading" class="page-intro__title">Saved Opportunities</h1>
+        <p class="page-intro__desc">Track opportunities you are interested in and manage your application progress.</p>
+      </div>
+    </section>
+
+    <section class="saved-section" aria-labelledby="saved-list-heading">
+      <div class="saved-section__toolbar">
+        <h2 id="saved-list-heading" class="saved-section__count-label">
+          <span id="saved-count">0</span> saved
+          <span id="saved-count-label" class="visually-hidden">opportunities</span>
+        </h2>
+        <div class="saved-section__controls">
+          <label for="saved-sort-select" class="visually-hidden">Sort saved opportunities</label>
+          <select id="saved-sort-select" class="opportunity-search__select" aria-label="Sort saved opportunities">
+            <option value="deadline-asc">Deadline: nearest first</option>
+            <option value="deadline-desc">Deadline: latest first</option>
+            <option value="title-asc">Title: A–Z</option>
+            <option value="saved-order">Save order</option>
+          </select>
+          <button id="clear-all-btn" type="button" class="btn btn--danger">Clear all saved</button>
+        </div>
+      </div>
+
+      <div
+        id="saved-status"
+        class="status-message"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        hidden
+      ></div>
+
+      <div id="saved-grid" class="saved-grid" aria-label="Saved opportunities list"></div>
+
+      <div id="saved-empty" class="empty-state" hidden>
+        <p class="empty-state__text">You have not saved any opportunities yet.</p>
+        <a href="index.html" class="btn btn--primary">Browse opportunities</a>
+      </div>
+
     </section>
 
   </main>
 
-  <footer>
-    <!-- footer-ის შიგთავსი -->
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p class="site-footer__copy">
+        OpportunityHub — opportunities sourced via <a href="https://docs.github.com/en/rest" target="_blank" rel="noopener noreferrer">GitHub Issues API</a>.
+      </p>
+      <nav class="site-footer__nav" aria-label="Footer navigation">
+        <a href="index.html">Opportunities</a>
+        <a href="saved.html">Saved</a>
+        <a href="submit.html">Suggest</a>
+      </nav>
+    </div>
   </footer>
 
   <script type="module" src="js/saved.js"></script>

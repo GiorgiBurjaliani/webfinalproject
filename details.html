@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="View full details of this opportunity including eligibility, deadline, location, and how to apply.">
+  <title>Opportunity Details — OpportunityHub</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a href="index.html" class="site-header__logo" aria-label="OpportunityHub — go to home page">
+        <span class="site-header__logo-icon" aria-hidden="true">◈</span>
+        OpportunityHub
+      </a>
+      <nav class="site-nav" aria-label="Main navigation">
+        <ul class="site-nav__list">
+          <li><a href="index.html" class="site-nav__link">Opportunities</a></li>
+          <li><a href="saved.html" class="site-nav__link">Saved</a></li>
+          <li><a href="submit.html" class="site-nav__link">Suggest</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+
+    <div class="details-back">
+      <a href="index.html" class="details-back__link" aria-label="Back to opportunities list">
+        ← Back to Opportunities
+      </a>
+    </div>
+
+    <div
+      id="details-status"
+      class="status-message"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      hidden
+    ></div>
+
+    <article id="details-content" class="opportunity-details" hidden aria-labelledby="details-title">
+
+      <div class="opportunity-details__header">
+        <div class="opportunity-details__meta-top">
+          <span id="details-category" class="opportunity-details__category"></span>
+          <span id="details-format" class="opportunity-details__badge"></span>
+          <span id="details-funding" class="opportunity-details__badge opportunity-details__badge--funding"></span>
+        </div>
+        <h1 id="details-title" class="opportunity-details__title"></h1>
+        <p id="details-organizer" class="opportunity-details__organizer"></p>
+        <div id="details-deadline-status" class="deadline-badge"></div>
+      </div>
+
+      <div class="opportunity-details__image-wrap">
+        <img id="details-image" class="opportunity-details__image" src="" alt="" loading="lazy">
+      </div>
+
+      <div class="opportunity-details__body">
+
+        <section class="opportunity-details__stats" aria-label="Key details">
+          <div class="opportunity-details__stat">
+            <span class="opportunity-details__stat-label">Region</span>
+            <span id="details-region" class="opportunity-details__stat-value"></span>
+          </div>
+          <div class="opportunity-details__stat">
+            <span class="opportunity-details__stat-label">Location</span>
+            <span id="details-location" class="opportunity-details__stat-value"></span>
+          </div>
+          <div class="opportunity-details__stat">
+            <span class="opportunity-details__stat-label">Application Deadline</span>
+            <span id="details-deadline" class="opportunity-details__stat-value"></span>
+          </div>
+          <div class="opportunity-details__stat">
+            <span class="opportunity-details__stat-label">Start Date</span>
+            <span id="details-start" class="opportunity-details__stat-value"></span>
+          </div>
+          <div class="opportunity-details__stat">
+            <span class="opportunity-details__stat-label">End Date</span>
+            <span id="details-end" class="opportunity-details__stat-value"></span>
+          </div>
+          <div class="opportunity-details__stat">
+            <span class="opportunity-details__stat-label">Eligibility</span>
+            <span id="details-eligibility" class="opportunity-details__stat-value"></span>
+          </div>
+          <div class="opportunity-details__stat">
+            <span class="opportunity-details__stat-label">Age Requirement</span>
+            <span id="details-age" class="opportunity-details__stat-value"></span>
+          </div>
+          <div class="opportunity-details__stat">
+            <span class="opportunity-details__stat-label">Experience</span>
+            <span id="details-experience" class="opportunity-details__stat-value"></span>
+          </div>
+        </section>
+
+        <section class="opportunity-details__description" aria-labelledby="details-desc-heading">
+          <h2 id="details-desc-heading" class="opportunity-details__section-title">About this Opportunity</h2>
+          <div id="details-description" class="opportunity-details__text"></div>
+        </section>
+
+        <section class="opportunity-details__benefits" aria-labelledby="details-benefits-heading">
+          <h2 id="details-benefits-heading" class="opportunity-details__section-title">Benefits &amp; Prizes</h2>
+          <div id="details-benefits" class="opportunity-details__text"></div>
+        </section>
+
+        <div class="opportunity-details__actions">
+          <a id="details-official-link" href="#" target="_blank" rel="noopener noreferrer" class="btn btn--primary" hidden>
+            Apply / Learn More
+          </a>
+          <button id="details-save-btn" type="button" class="btn btn--secondary">Save Opportunity</button>
+        </div>
+
+      </div>
+    </article>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <p class="site-footer__copy">
+        OpportunityHub — opportunities sourced via <a href="https://docs.github.com/en/rest" target="_blank" rel="noopener noreferrer">GitHub Issues API</a>.
+      </p>
+      <nav class="site-footer__nav" aria-label="Footer navigation">
+        <a href="index.html">Opportunities</a>
+        <a href="saved.html">Saved</a>
+        <a href="submit.html">Suggest</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script type="module" src="js/details.js"></script>
+</body>
+</html>
