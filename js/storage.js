@@ -104,8 +104,9 @@ export function clearSavedOpportunities() {
 }
 
 // ---------------------------------------------------------------------------
-// Application statuses
+// Application statuses — track user progress for each saved opportunity
 // ---------------------------------------------------------------------------
+
 
 /**
  * Returns the status map: { opportunityId: statusString }
