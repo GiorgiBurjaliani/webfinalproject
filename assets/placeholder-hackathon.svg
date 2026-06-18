@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <linearGradient id="f" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#818cf8" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#g)"/>
+  <!-- Decorative grid lines -->
+  <path d="M 0,50 L 800,50 M 0,100 L 800,100 M 0,150 L 800,150 M 0,200 L 800,200 M 0,250 L 800,250 M 0,300 L 800,300 M 0,350 L 800,350 M 0,400 L 800,400" stroke="#334155" stroke-width="1" opacity="0.3"/>
+  <path d="M 100,0 L 100,450 M 200,0 L 200,450 M 300,0 L 300,450 M 400,0 L 400,450 M 500,0 L 500,450 M 600,0 L 600,450 M 700,0 L 700,450" stroke="#334155" stroke-width="1" opacity="0.3"/>
+  
+  <!-- Cyberpunk grid perspective / details -->
+  <polygon points="400,100 700,350 100,350" fill="url(#f)"/>
+  
+  <!-- Hackathon Code Symbol -->
+  <text x="400" y="240" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="900" fill="#38bdf8" text-anchor="middle" letter-spacing="4">&lt; HACK /&gt;</text>
+  <text x="400" y="290" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="500" fill="#94a3b8" text-anchor="middle" letter-spacing="6">COLLABORATE &amp; BUILD</text>
+  
+  <!-- Corner decors -->
+  <rect x="30" y="30" width="20" height="20" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.6"/>
+  <rect x="750" y="30" width="20" height="20" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.6"/>
+  <rect x="30" y="400" width="20" height="20" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.6"/>
+  <rect x="750" y="400" width="20" height="20" fill="none" stroke="#38bdf8" stroke-width="2" opacity="0.6"/>
+</svg>

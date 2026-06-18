@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#064e3b"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#g)"/>
+  
+  <!-- Starry Sky -->
+  <circle cx="150" cy="80" r="2" fill="#fff" opacity="0.8"/>
+  <circle cx="280" cy="120" r="1.5" fill="#fff" opacity="0.5"/>
+  <circle cx="350" cy="60" r="2.5" fill="#fff" opacity="0.9"/>
+  <circle cx="500" cy="100" r="2" fill="#fff" opacity="0.6"/>
+  <circle cx="620" cy="70" r="1" fill="#fff" opacity="0.4"/>
+  <circle cx="700" cy="130" r="3" fill="#fff" opacity="0.7"/>
+
+  <!-- Mountains -->
+  <polygon points="-50,450 250,220 500,450" fill="#115e59" opacity="0.4"/>
+  <polygon points="350,450 600,180 850,450" fill="#115e59" opacity="0.3"/>
+  <polygon points="150,450 420,250 700,450" fill="#0f766e" opacity="0.5"/>
+
+  <!-- Tent -->
+  <polygon points="400,220 480,360 320,360" fill="#f59e0b"/>
+  <polygon points="400,220 400,360 320,360" fill="#d97706"/>
+  <!-- Tent opening -->
+  <polygon points="400,280 440,360 360,360" fill="#1e293b"/>
+  
+  <!-- Camp Label -->
+  <text x="400" y="415" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="700" fill="#2dd4bf" text-anchor="middle" letter-spacing="4">TECHNOLOGY CAMP</text>
+</svg>
