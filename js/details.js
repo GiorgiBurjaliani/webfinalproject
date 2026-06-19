@@ -21,7 +21,6 @@ const contentEl         = document.getElementById('details-content');
 const saveBtn           = document.getElementById('details-save-btn');
 const sourceLink        = document.getElementById('details-source-link');
 const registerLink      = document.getElementById('details-register-link');
-const registerMissingEl = document.getElementById('details-register-missing');
 
 // ---------------------------------------------------------------------------
 // Render helpers
@@ -164,9 +163,8 @@ function renderOpportunityDetails(opp) {
     }
   }
 
-  // Official registration link / missing message logic
-  if (registerLink && registerMissingEl) {
-    registerMissingEl.hidden = true;
+  // Official registration link logic
+  if (registerLink) {
     registerLink.onclick = null;
 
     if (hasRegistrationUrl && !linksAreSame) {

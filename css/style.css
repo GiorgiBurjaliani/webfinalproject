@@ -1301,18 +1301,6 @@ main {
   }
 }
 
-.details-register-missing {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-  font-style: italic;
-  display: inline-flex;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-left: 3px solid var(--accent-hover, #ff8c00);
-  border-radius: 4px;
-}
-
 .registration-popup {
   position: fixed;
   right: 1.5rem;
