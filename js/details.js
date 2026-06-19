@@ -135,9 +135,13 @@ function renderOpportunityDetails(opp) {
   if (benefitsEl) benefitsEl.textContent = opp.benefits || 'Not specified';
 
   // Official source link logic
+  const sourceUrl = opp.officialSourceUrl || opp.officialUrl;
+  const registrationUrl = opp.officialRegistrationUrl || opp.officialUrl || opp.officialSourceUrl;
+  const hasSourceUrl = sourceUrl && !isPlaceholderUrl(sourceUrl) && !isGeneralHomepageUrl(sourceUrl);
+  const hasRegistrationUrl = registrationUrl && !isPlaceholderUrl(registrationUrl);
+
   if (sourceLink) {
-    const sourceUrl = opp.officialSourceUrl || opp.officialUrl;
-    if (sourceUrl && !isPlaceholderUrl(sourceUrl) && !isGeneralHomepageUrl(sourceUrl)) {
+    if (hasSourceUrl) {
       sourceLink.href = sourceUrl;
       sourceLink.hidden = false;
     } else {
@@ -147,14 +151,13 @@ function renderOpportunityDetails(opp) {
 
   // Official registration link / missing message logic
   if (registerLink && registerMissingEl) {
-    const registrationUrl = opp.officialRegistrationUrl || opp.officialUrl || opp.officialSourceUrl;
-    if (registrationUrl && !isPlaceholderUrl(registrationUrl)) {
+    if (hasRegistrationUrl) {
       registerLink.href = registrationUrl;
       registerLink.hidden = false;
       registerMissingEl.hidden = true;
     } else {
       registerLink.hidden = true;
-      registerMissingEl.hidden = false;
+      registerMissingEl.hidden = hasSourceUrl;
     }
   }
 
