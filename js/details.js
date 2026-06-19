@@ -136,8 +136,9 @@ function renderOpportunityDetails(opp) {
 
   // Official source link logic
   if (sourceLink) {
-    if (opp.officialSourceUrl && !isPlaceholderUrl(opp.officialSourceUrl) && !isGeneralHomepageUrl(opp.officialSourceUrl)) {
-      sourceLink.href = opp.officialSourceUrl;
+    const sourceUrl = opp.officialSourceUrl || opp.officialUrl;
+    if (sourceUrl && !isPlaceholderUrl(sourceUrl) && !isGeneralHomepageUrl(sourceUrl)) {
+      sourceLink.href = sourceUrl;
       sourceLink.hidden = false;
     } else {
       sourceLink.hidden = true;
@@ -146,8 +147,9 @@ function renderOpportunityDetails(opp) {
 
   // Official registration link / missing message logic
   if (registerLink && registerMissingEl) {
-    if (opp.officialRegistrationUrl && !isPlaceholderUrl(opp.officialRegistrationUrl)) {
-      registerLink.href = opp.officialRegistrationUrl;
+    const registrationUrl = opp.officialRegistrationUrl || opp.officialUrl || opp.officialSourceUrl;
+    if (registrationUrl && !isPlaceholderUrl(registrationUrl)) {
+      registerLink.href = registrationUrl;
       registerLink.hidden = false;
       registerMissingEl.hidden = true;
     } else {

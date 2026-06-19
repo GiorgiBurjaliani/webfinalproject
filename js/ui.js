@@ -12,6 +12,7 @@ import {
   categoryLabel,
   fundingLabel,
   formatLabel,
+  isPlaceholderUrl,
 } from './utils.js';
 import { isOpportunitySaved } from './storage.js';
 
@@ -197,6 +198,18 @@ export function createOpportunityCard(opportunity, onSaveToggle) {
   detailsLink.textContent = 'View Details';
   detailsLink.setAttribute('aria-label', `View details for ${opportunity.title}`);
 
+  const officialUrl = opportunity.officialRegistrationUrl || opportunity.officialSourceUrl || opportunity.officialUrl;
+  let officialLink = null;
+  if (officialUrl && !isPlaceholderUrl(officialUrl)) {
+    officialLink = document.createElement('a');
+    officialLink.className = 'btn btn--secondary btn--sm';
+    officialLink.href = officialUrl;
+    officialLink.target = '_blank';
+    officialLink.rel = 'noopener noreferrer';
+    officialLink.textContent = opportunity.officialRegistrationUrl ? 'Apply' : 'Official Source';
+    officialLink.setAttribute('aria-label', `Open official link for ${opportunity.title}`);
+  }
+
   const saveBtn = document.createElement('button');
   saveBtn.type = 'button';
   saveBtn.className = 'btn btn--secondary btn--sm';
@@ -222,6 +235,9 @@ export function createOpportunityCard(opportunity, onSaveToggle) {
   });
 
   actions.appendChild(detailsLink);
+  if (officialLink) {
+    actions.appendChild(officialLink);
+  }
   actions.appendChild(saveBtn);
 
   // --- Assemble card ---

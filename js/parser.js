@@ -51,13 +51,13 @@ function parseBody(body) {
   let buffer = [];
 
   for (const line of lines) {
-    // Match "**Key:** value" pattern
-    const boldMatch = line.match(/^\*\*([^*]+)\*\*\s*[:\-]\s*(.*)/);
+    // Match both "**Key:** value" and "**Key**: value" patterns.
+    const boldMatch = line.match(/^\*\*([^*]+?)\s*[:\-]?\*\*\s*[:\-]?\s*(.*)/);
     if (boldMatch) {
       if (currentKey && buffer.length > 0) {
         fields[currentKey] = buffer.join('\n').trim();
       }
-      currentKey = boldMatch[1].trim().toLowerCase();
+      currentKey = normalizeFieldKey(boldMatch[1]);
       buffer = [boldMatch[2].trim()];
       continue;
     }
@@ -68,7 +68,7 @@ function parseBody(body) {
       if (currentKey && buffer.length > 0) {
         fields[currentKey] = buffer.join('\n').trim();
       }
-      currentKey = sectionMatch[1].trim().toLowerCase();
+      currentKey = normalizeFieldKey(sectionMatch[1]);
       buffer = [];
       continue;
     }
@@ -79,7 +79,7 @@ function parseBody(body) {
       if (currentKey && buffer.length > 0) {
         fields[currentKey] = buffer.join('\n').trim();
       }
-      currentKey = colonMatch[1].trim().toLowerCase();
+      currentKey = normalizeFieldKey(colonMatch[1]);
       buffer = [colonMatch[2].trim()];
       continue;
     }
@@ -96,6 +96,14 @@ function parseBody(body) {
   }
 
   return fields;
+}
+
+function normalizeFieldKey(key) {
+  return String(key || '')
+    .trim()
+    .replace(/[:\-]+$/, '')
+    .trim()
+    .toLowerCase();
 }
 
 /**
