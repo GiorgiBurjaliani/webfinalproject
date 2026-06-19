@@ -38,6 +38,20 @@ function setText(id, text) {
   if (el) el.textContent = text || 'Not specified';
 }
 
+function normalizeUrlForCompare(url) {
+  if (!url || typeof url !== 'string') return '';
+  try {
+    const parsed = new URL(url.trim());
+    parsed.hash = '';
+    if (parsed.pathname !== '/') {
+      parsed.pathname = parsed.pathname.replace(/\/+$/, '');
+    }
+    return parsed.toString();
+  } catch {
+    return url.trim().replace(/\/+$/, '');
+  }
+}
+
 /**
  * Renders all opportunity fields into the detail page DOM.
  *
@@ -139,6 +153,7 @@ function renderOpportunityDetails(opp) {
   const registrationUrl = opp.officialRegistrationUrl || opp.officialUrl || opp.officialSourceUrl;
   const hasSourceUrl = sourceUrl && !isPlaceholderUrl(sourceUrl) && !isGeneralHomepageUrl(sourceUrl);
   const hasRegistrationUrl = registrationUrl && !isPlaceholderUrl(registrationUrl);
+  const linksAreSame = normalizeUrlForCompare(sourceUrl) === normalizeUrlForCompare(registrationUrl);
 
   if (sourceLink) {
     if (hasSourceUrl) {
@@ -151,7 +166,7 @@ function renderOpportunityDetails(opp) {
 
   // Official registration link / missing message logic
   if (registerLink && registerMissingEl) {
-    if (hasRegistrationUrl) {
+    if (hasRegistrationUrl && !linksAreSame) {
       registerLink.href = registrationUrl;
       registerLink.hidden = false;
       registerMissingEl.hidden = true;
