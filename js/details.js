@@ -5,7 +5,7 @@
  */
 
 import { fetchOpportunityByNumber } from './api.js';
-import { saveOpportunity, removeSavedOpportunity, isOpportunitySaved } from './storage.js';
+import { saveOpportunity, removeSavedOpportunity, isOpportunitySaved, updateOpportunityStatus } from './storage.js';
 import { formatDate, getDeadlineStatus, fundingLabel, formatLabel, categoryLabel, isPlaceholderUrl, isGeneralHomepageUrl } from './utils.js';
 import { showStatusMessage, clearStatusMessage, updateSaveButton, getPlaceholderImage } from './ui.js';
 import { DEMO_OPPORTUNITIES } from './config.js';
@@ -166,13 +166,24 @@ function renderOpportunityDetails(opp) {
 
   // Official registration link / missing message logic
   if (registerLink && registerMissingEl) {
+    registerMissingEl.hidden = true;
+    registerLink.onclick = null;
+
     if (hasRegistrationUrl && !linksAreSame) {
       registerLink.href = registrationUrl;
+      registerLink.target = '_blank';
+      registerLink.rel = 'noopener noreferrer';
       registerLink.hidden = false;
-      registerMissingEl.hidden = true;
     } else {
-      registerLink.hidden = true;
-      registerMissingEl.hidden = hasSourceUrl;
+      registerLink.href = '#';
+      registerLink.removeAttribute('target');
+      registerLink.removeAttribute('rel');
+      registerLink.textContent = 'Apply / Register';
+      registerLink.hidden = false;
+      registerLink.onclick = (event) => {
+        event.preventDefault();
+        handleLocalRegistration(opp);
+      };
     }
   }
 
@@ -213,6 +224,54 @@ function handleDetailsSaveToggle(opportunity) {
     showStatusMessage(statusEl, `"${opportunity.title}" saved!`, 'success');
   }
   setTimeout(() => clearStatusMessage(statusEl), 3000);
+}
+
+function handleLocalRegistration(opportunity) {
+  saveOpportunity(opportunity);
+  updateOpportunityStatus(opportunity.id, 'applied');
+
+  if (saveBtn) {
+    updateSaveButton(saveBtn, true);
+    saveBtn.setAttribute('aria-label', `Remove "${opportunity.title}" from saved`);
+  }
+
+  showStatusMessage(
+    statusEl,
+    `"${opportunity.title}" was saved and marked as applied.`,
+    'success'
+  );
+  showRegistrationPopup(opportunity.title);
+  setTimeout(() => clearStatusMessage(statusEl), 3000);
+}
+
+function showRegistrationPopup(title) {
+  const existingPopup = document.getElementById('registration-success-popup');
+  if (existingPopup) {
+    existingPopup.remove();
+  }
+
+  const popup = document.createElement('div');
+  popup.id = 'registration-success-popup';
+  popup.className = 'registration-popup';
+  popup.setAttribute('role', 'alert');
+
+  const message = document.createElement('p');
+  message.className = 'registration-popup__message';
+  message.textContent = `Successfully registered for "${title}".`;
+
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.className = 'registration-popup__close';
+  closeBtn.textContent = 'Close';
+  closeBtn.addEventListener('click', () => popup.remove());
+
+  popup.appendChild(message);
+  popup.appendChild(closeBtn);
+  document.body.appendChild(popup);
+
+  setTimeout(() => {
+    popup.remove();
+  }, 3500);
 }
 
 // ---------------------------------------------------------------------------
