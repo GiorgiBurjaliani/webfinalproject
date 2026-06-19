@@ -1,25 +1,11 @@
-/**
- * api.js
- * GitHub REST API access layer for OpportunityHub.
- * Handles fetch, HTTP errors, rate-limit detection, and Pull Request filtering.
- */
+// This file keeps all GitHub API requests in one place.
+// It also changes GitHub's raw issue data into opportunities for the app.
 
 import { ISSUES_ENDPOINT, GITHUB_ACCEPT_HEADER, PAGE_SIZE } from './config.js';
 import { parseOpportunityIssue } from './parser.js';
 import { getApiCache, setApiCache } from './storage.js';
 
-// ---------------------------------------------------------------------------
-// Internal fetch wrapper
-// ---------------------------------------------------------------------------
-
-/**
- * Performs a fetch request to the GitHub API with correct headers.
- * Converts non-OK HTTP responses to descriptive Error objects.
- *
- * @param {string} url - Full URL to fetch.
- * @returns {Promise<object|object[]>} Parsed JSON response.
- * @throws {Error} With a user-friendly message for common HTTP errors.
- */
+// Small helper for GitHub requests, so I do not repeat the same fetch code.
 async function githubFetch(url) {
   let response;
 
@@ -29,8 +15,8 @@ async function githubFetch(url) {
         Accept: GITHUB_ACCEPT_HEADER,
       },
     });
-  } catch (networkError) {
-    // fetch() itself threw — network is unavailable.
+  } catch {
+    // If fetch fails here, it usually means the internet connection is missing.
     throw new Error(
       'Network error: unable to reach the GitHub API. Please check your internet connection.'
     );
@@ -67,22 +53,7 @@ async function githubFetch(url) {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Public API functions
-// ---------------------------------------------------------------------------
-
-/**
- * Fetches a page of open Issues from the repository and returns an array of
- * normalized opportunity objects.
- *
- * Pull Requests are automatically filtered out (GitHub Issues endpoints
- * return both Issues and Pull Requests; PRs have a `pull_request` property).
- *
- * Uses a short-lived localStorage cache to reduce rate-limit pressure.
- *
- * @param {number} page - Page number (1-based).
- * @returns {Promise<{ opportunities: object[], hasMore: boolean }>}
- */
+// Loads one page of GitHub issues and turns them into opportunity cards.
 export async function fetchOpportunities(page = 1) {
   const cacheKey = `page-${page}`;
   const cached = getApiCache(cacheKey);
@@ -97,7 +68,7 @@ export async function fetchOpportunities(page = 1) {
     throw new Error('GitHub API returned an unexpected response format for issues.');
   }
 
-  // Filter out Pull Requests and parse each Issue into a normalized object.
+  // GitHub can return pull requests here too, so I only keep real issues.
   const opportunities = [];
   for (const issue of rawIssues) {
     try {
@@ -106,12 +77,11 @@ export async function fetchOpportunities(page = 1) {
         opportunities.push(parsed);
       }
     } catch {
-      // One malformed Issue must not crash the entire page load.
-      // Skip it silently.
+      // If one issue has bad formatting, the rest of the page should still load.
     }
   }
 
-  // hasMore is true when the API returned a full page — there may be more.
+  // If the page is full, there might be another page after this one.
   const hasMore = rawIssues.length === PAGE_SIZE;
 
   const result = { opportunities, hasMore };
@@ -119,13 +89,7 @@ export async function fetchOpportunities(page = 1) {
   return result;
 }
 
-/**
- * Fetches a single Issue by number and returns a normalized opportunity object.
- *
- * @param {number|string} issueNumber
- * @returns {Promise<object>} Normalized opportunity object.
- * @throws {Error} If the issue is not found, is a PR, or data is malformed.
- */
+// Used on the details page when the user opens one opportunity.
 export async function fetchOpportunityByNumber(issueNumber) {
   const num = parseInt(issueNumber, 10);
   if (!num || num < 1) {

@@ -1,17 +1,6 @@
-/**
- * submit.js
- * Entry point for submit.html — Suggest an Opportunity form.
- * Handles HTML + JS validation, draft saving, and local submission.
- */
-
 import { saveSuggestionDraft, getSuggestionDraft, clearSuggestionDraft, addSubmittedSuggestion } from './storage.js';
 import { showStatusMessage, clearStatusMessage } from './ui.js';
 import { checkAuth } from './auth.js';
-
-
-// ---------------------------------------------------------------------------
-// DOM references
-// ---------------------------------------------------------------------------
 
 const form          = document.getElementById('suggestion-form');
 const submitStatus  = document.getElementById('submit-status');
@@ -20,7 +9,7 @@ const anotherBtn    = document.getElementById('submit-another-btn');
 const errorSummary  = document.getElementById('form-error-summary');
 const errorList     = document.getElementById('form-error-list');
 
-// Field references
+// Form fields that are used for validation and draft saving.
 const fieldTitle       = document.getElementById('field-title');
 const fieldOrganizer   = document.getElementById('field-organizer');
 const fieldEmail       = document.getElementById('field-email');
@@ -30,17 +19,7 @@ const fieldDeadline    = document.getElementById('field-deadline');
 const fieldUrl         = document.getElementById('field-url');
 const fieldDescription = document.getElementById('field-description');
 
-// ---------------------------------------------------------------------------
-// Validation helpers
-// ---------------------------------------------------------------------------
-
-/**
- * Shows a field-level error message.
- *
- * @param {string} fieldId   - The field input element id.
- * @param {string} errorId   - The error paragraph element id.
- * @param {string} message
- */
+// Shows an error under one form field.
 function showFieldError(fieldId, errorId, message) {
   const fieldEl = document.getElementById(fieldId);
   const errorEl = document.getElementById(errorId);
@@ -54,12 +33,7 @@ function showFieldError(fieldId, errorId, message) {
   }
 }
 
-/**
- * Clears a field-level error message.
- *
- * @param {string} fieldId
- * @param {string} errorId
- */
+// Clears the error for one form field.
 function clearFieldError(fieldId, errorId) {
   const fieldEl = document.getElementById(fieldId);
   const errorEl = document.getElementById(errorId);
@@ -73,9 +47,7 @@ function clearFieldError(fieldId, errorId) {
   }
 }
 
-/**
- * Clears all field errors and the summary panel.
- */
+// Clears every validation message before checking the form again.
 function clearAllErrors() {
   const errorIds = [
     ['field-title', 'field-title-error'],
@@ -94,11 +66,7 @@ function clearAllErrors() {
   if (errorList) errorList.textContent = '';
 }
 
-/**
- * Shows the error summary panel with a list of messages.
- *
- * @param {string[]} messages
- */
+// Shows all validation errors together at the top of the form.
 function showErrorSummary(messages) {
   if (!errorSummary || !errorList) return;
   errorList.textContent = '';
@@ -108,18 +76,11 @@ function showErrorSummary(messages) {
     errorList.appendChild(li);
   }
   errorSummary.hidden = false;
-  // Move focus to summary for screen reader users
+  // Move focus to the summary so keyboard users notice the errors too.
   errorSummary.focus();
 }
 
-// ---------------------------------------------------------------------------
-// Form data extraction
-// ---------------------------------------------------------------------------
-
-/**
- * Reads and normalizes all form field values into a plain object.
- * @returns {object}
- */
+// Reads all form values and puts them into one object.
 function readFormData() {
   const formatRadio = form.querySelector('input[name="format"]:checked');
   const checkedBenefits = Array.from(form.querySelectorAll('input[name="benefits"]:checked'))
@@ -140,17 +101,7 @@ function readFormData() {
   };
 }
 
-// ---------------------------------------------------------------------------
-// JavaScript validation
-// ---------------------------------------------------------------------------
-
-/**
- * Validates the form data, returns an array of error objects.
- * Each object has { fieldId, errorId, message }.
- *
- * @param {object} data - From readFormData()
- * @returns {Array<{fieldId:string, errorId:string, message:string}>}
- */
+// Returns field-level errors that can be shown in the form and summary.
 function validateFormData(data) {
   const errors = [];
 
@@ -205,22 +156,13 @@ function validateFormData(data) {
   return errors;
 }
 
-// ---------------------------------------------------------------------------
-// Draft auto-save
-// ---------------------------------------------------------------------------
-
-/**
- * Saves the current form state as a draft in localStorage.
- * Called on every input event.
- */
+// Drafts protect the user from losing form text on refresh.
 function handleDraftSave() {
   const data = readFormData();
   saveSuggestionDraft(data);
 }
 
-/**
- * Restores a previously saved draft into the form fields.
- */
+// Restores the draft if the user comes back to the form later.
 function restoreDraft() {
   const draft = getSuggestionDraft();
   if (!draft) return;
@@ -250,17 +192,9 @@ function restoreDraft() {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Form submission
-// ---------------------------------------------------------------------------
-
-/**
- * Handles form submit event. Prevents default, validates, and saves locally.
- *
- * @param {Event} event
- */
+// Handles the final submit button.
 function handleSubmit(event) {
-  event.preventDefault(); // Never submit the HTML form natively
+  event.preventDefault(); // Keep the page from reloading.
   clearAllErrors();
   clearStatusMessage(submitStatus);
 
@@ -268,7 +202,7 @@ function handleSubmit(event) {
   const errors = validateFormData(data);
 
   if (errors.length > 0) {
-    // Show individual field errors
+    // Show errors next to the exact fields.
     for (const err of errors) {
       if (err.fieldId) {
         showFieldError(err.fieldId, err.errorId, err.message);
@@ -277,23 +211,21 @@ function handleSubmit(event) {
         if (el) { el.textContent = err.message; el.hidden = false; }
       }
     }
-    // Show summary
+    // Also show all errors together.
     showErrorSummary(errors.map((e) => e.message));
     return;
   }
 
-  // All valid — save locally
+  // If everything is valid, save the suggestion locally.
   addSubmittedSuggestion(data);
   clearSuggestionDraft();
 
-  // Hide form, show success panel
+  // Hide the form and show the success message.
   if (form)           form.hidden = true;
   if (successPanel)   successPanel.hidden = false;
 }
 
-/**
- * Handles the "Suggest another" button — shows form again, resets.
- */
+// Lets the user submit another suggestion after success.
 function handleSuggestAnother() {
   if (form)          { form.hidden = false; form.reset(); }
   if (successPanel)  successPanel.hidden = true;
@@ -301,24 +233,19 @@ function handleSuggestAnother() {
   clearStatusMessage(submitStatus);
 }
 
-/**
- * Handles form reset — clears draft and errors.
- */
+// Clears the saved draft when the form is reset.
 function handleFormReset() {
   clearAllErrors();
   clearSuggestionDraft();
   clearStatusMessage(submitStatus);
 }
 
-// ---------------------------------------------------------------------------
-// Register events and init
-// ---------------------------------------------------------------------------
-
+// Connects the form events to the functions above.
 function registerEventListeners() {
   if (form) {
     form.addEventListener('submit', handleSubmit);
     form.addEventListener('reset', handleFormReset);
-    // Auto-save draft on any input/change
+    // Save draft on any input or dropdown change.
     form.addEventListener('input', handleDraftSave);
     form.addEventListener('change', handleDraftSave);
   }
@@ -327,6 +254,7 @@ function registerEventListeners() {
   }
 }
 
+// Starts the submit page.
 function init() {
   checkAuth();
   restoreDraft();

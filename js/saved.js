@@ -1,9 +1,3 @@
-/**
- * saved.js
- * Entry point for saved.html — Saved Opportunities page.
- * Reads from localStorage, renders saved cards with status management.
- */
-
 import {
   getSavedOpportunities,
   removeSavedOpportunity,
@@ -11,14 +5,11 @@ import {
   getStatusForOpportunity,
   updateOpportunityStatus,
 } from './storage.js';
-import { formatDate, getDeadlineStatus, categoryLabel, fundingLabel, formatLabel, compareDeadlinesAsc, compareDeadlinesDesc, isPlaceholderUrl } from './utils.js';
+import { formatDate, getDeadlineStatus, categoryLabel, fundingLabel, formatLabel, compareDeadlinesAsc, compareDeadlinesDesc } from './utils.js';
 import { showStatusMessage, clearStatusMessage } from './ui.js';
 import { checkAuth } from './auth.js';
 
-// ---------------------------------------------------------------------------
-// Available application statuses
-// ---------------------------------------------------------------------------
-
+// These are the statuses the user can choose for a saved opportunity.
 const APPLICATION_STATUSES = [
   { value: 'interested',        label: 'Interested' },
   { value: 'planning-to-apply', label: 'Planning to Apply' },
@@ -28,10 +19,6 @@ const APPLICATION_STATUSES = [
   { value: 'completed',         label: 'Completed' },
 ];
 
-// ---------------------------------------------------------------------------
-// DOM references
-// ---------------------------------------------------------------------------
-
 const savedGrid    = document.getElementById('saved-grid');
 const savedEmpty   = document.getElementById('saved-empty');
 const savedCount   = document.getElementById('saved-count');
@@ -39,29 +26,13 @@ const savedStatus  = document.getElementById('saved-status');
 const clearAllBtn  = document.getElementById('clear-all-btn');
 const sortSelect   = document.getElementById('saved-sort-select');
 
-// ---------------------------------------------------------------------------
-// Count update
-// ---------------------------------------------------------------------------
-
-/**
- * Updates the visible saved count label.
- */
+// Shows how many opportunities are currently saved.
 function updateSavedCount() {
   const count = getSavedOpportunities().length;
   if (savedCount) savedCount.textContent = count;
 }
 
-// ---------------------------------------------------------------------------
-// Card creation
-// ---------------------------------------------------------------------------
-
-/**
- * Creates a DOM element for one saved opportunity card.
- * Each card includes a status selector, details link, and remove button.
- *
- * @param {object} opp - Normalized opportunity object from localStorage.
- * @returns {HTMLElement}
- */
+// Builds one card for the Saved page.
 function createSavedCard(opp) {
   const currentStatus = getStatusForOpportunity(opp.id);
 
@@ -69,26 +40,24 @@ function createSavedCard(opp) {
   article.className = `saved-card status--${currentStatus}`;
   article.setAttribute('data-id', opp.id);
 
-  // Category badge
+  // Category and data type badges are similar to the home page cards.
   const catBadge = document.createElement('span');
   catBadge.className = `opportunity-card__category opportunity-card__category--${opp.category}`;
   catBadge.textContent = opp.categoryLabel || categoryLabel(opp.category);
 
-  // Demo / Verified badge
   let badgeEl = null;
   if (opp.isVerified) {
     badgeEl = document.createElement('span');
     badgeEl.className = 'badge badge--verified';
     badgeEl.textContent = 'Verified Opportunity';
-    badgeEl.style.marginLeft = '0.5rem';
+    badgeEl.classList.add('badge--spaced');
   } else if (opp.isDemo) {
     badgeEl = document.createElement('span');
     badgeEl.className = 'badge badge--demo';
     badgeEl.textContent = 'Demo Opportunity';
-    badgeEl.style.marginLeft = '0.5rem';
+    badgeEl.classList.add('badge--spaced');
   }
 
-  // Title as link to details
   const titleEl = document.createElement('h2');
   titleEl.className = 'saved-card__title';
   const titleLink = document.createElement('a');
@@ -97,12 +66,10 @@ function createSavedCard(opp) {
   titleLink.textContent = opp.title;
   titleEl.appendChild(titleLink);
 
-  // Organizer
   const organizerEl = document.createElement('p');
   organizerEl.className = 'saved-card__organizer';
   organizerEl.textContent = opp.organizer;
 
-  // Meta row
   const metaEl = document.createElement('ul');
   metaEl.className = 'opportunity-card__meta';
   metaEl.setAttribute('aria-label', 'Opportunity details');
@@ -124,7 +91,7 @@ function createSavedCard(opp) {
   addMeta('Format', formatLabel(opp.format));
   addMeta('Funding', fundingLabel(opp.funding));
 
-  // Deadline with status badge
+  // Deadline with a small status badge.
   const deadlineRow = document.createElement('div');
   deadlineRow.className = 'opportunity-card__deadline-row';
   const dlLabel = document.createElement('span');
@@ -141,7 +108,7 @@ function createSavedCard(opp) {
   deadlineRow.appendChild(dlDate);
   deadlineRow.appendChild(dlBadge);
 
-  // Status selector
+  // Dropdown where the user tracks their application progress.
   const statusWrap = document.createElement('div');
   statusWrap.className = 'saved-card__status-wrap';
   const statusLabel = document.createElement('label');
@@ -168,7 +135,7 @@ function createSavedCard(opp) {
   statusWrap.appendChild(statusLabel);
   statusWrap.appendChild(statusSelect);
 
-  // Actions
+  // Main actions for the saved item.
   const actions = document.createElement('div');
   actions.className = 'opportunity-card__actions';
 
@@ -188,7 +155,7 @@ function createSavedCard(opp) {
   actions.appendChild(detailsLink);
   actions.appendChild(removeBtn);
 
-  // Assemble
+  // Put the saved card together.
   article.appendChild(catBadge);
   if (badgeEl) {
     article.appendChild(badgeEl);
@@ -203,13 +170,7 @@ function createSavedCard(opp) {
   return article;
 }
 
-// ---------------------------------------------------------------------------
-// Render
-// ---------------------------------------------------------------------------
-
-/**
- * Reads saved opportunities, sorts them, and renders them in the grid.
- */
+// Reads saved opportunities and shows them in the grid.
 function renderSavedOpportunities() {
   if (!savedGrid) return;
   savedGrid.textContent = '';
@@ -226,7 +187,7 @@ function renderSavedOpportunities() {
   if (savedEmpty) savedEmpty.hidden = true;
   if (clearAllBtn) clearAllBtn.disabled = false;
 
-  // Apply sort
+  // Apply the selected sort option.
   const sortValue = sortSelect ? sortSelect.value : 'deadline-asc';
   switch (sortValue) {
     case 'deadline-asc':
@@ -248,31 +209,19 @@ function renderSavedOpportunities() {
     try {
       fragment.appendChild(createSavedCard(opp));
     } catch {
-      // Skip broken entries
+      // If one saved item is broken, still show the others.
     }
   }
   savedGrid.appendChild(fragment);
   updateSavedCount();
 }
 
-// ---------------------------------------------------------------------------
-// Event handlers
-// ---------------------------------------------------------------------------
-
-/**
- * Handles status select change for a saved opportunity.
- * Updates localStorage and applies a CSS class to the card immediately.
- *
- * @param {number|string} id
- * @param {string} status
- * @param {HTMLElement} cardEl
- */
+// Saves the new status and updates the card color right away.
 function handleStatusChange(id, status, cardEl) {
   updateOpportunityStatus(id, status);
 
-  // Update the card's CSS class immediately (no page reload)
   if (cardEl) {
-    // Remove old status class
+    // Remove the old status class before adding the new one.
     cardEl.className = cardEl.className.replace(/status--\S+/g, '').trim();
     cardEl.classList.add(`status--${status}`);
   }
@@ -281,23 +230,17 @@ function handleStatusChange(id, status, cardEl) {
   setTimeout(() => clearStatusMessage(savedStatus), 2500);
 }
 
-/**
- * Handles the Remove button click on a saved card.
- * Removes the item and re-renders without a page reload.
- *
- * @param {number|string} id
- * @param {string} title
- */
+// Removes one opportunity from the saved list.
 function handleRemoveSaved(id, title) {
   removeSavedOpportunity(id);
 
-  // Remove card from DOM immediately
+  // Remove the card from the page without refreshing.
   const cardEl = savedGrid.querySelector(`[data-id="${id}"]`);
   if (cardEl) cardEl.remove();
 
   updateSavedCount();
 
-  // Show empty state if no items remain
+  // If nothing is left, show the empty message.
   const remaining = getSavedOpportunities();
   if (remaining.length === 0) {
     if (savedEmpty) savedEmpty.hidden = false;
@@ -308,33 +251,26 @@ function handleRemoveSaved(id, title) {
   setTimeout(() => clearStatusMessage(savedStatus), 2500);
 }
 
-/**
- * Handles Clear All button — confirms, clears storage, re-renders.
- */
+// Clears everything after the browser confirmation.
 function handleClearAll() {
   const cleared = clearSavedOpportunities();
-  if (!cleared) return; // User cancelled the confirm dialog
+  if (!cleared) return;
   renderSavedOpportunities();
   showStatusMessage(savedStatus, 'All saved opportunities have been cleared.', 'info');
   setTimeout(() => clearStatusMessage(savedStatus), 3000);
 }
 
-/**
- * Handles sort select change — re-renders with new order.
- */
+// Re-render when the saved sort option changes.
 function handleSortChange() {
   renderSavedOpportunities();
 }
-
-// ---------------------------------------------------------------------------
-// Register events and init
-// ---------------------------------------------------------------------------
 
 function registerEventListeners() {
   if (clearAllBtn) clearAllBtn.addEventListener('click', handleClearAll);
   if (sortSelect)  sortSelect.addEventListener('change', handleSortChange);
 }
 
+// Starts the saved page.
 function init() {
   checkAuth();
   registerEventListeners();

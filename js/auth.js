@@ -1,13 +1,6 @@
-/**
- * auth.js
- * Manages user authentication state and site-header user integration.
- */
+// Authentication check
 
-/**
- * Checks if the user is authenticated.
- * If not, redirects to login.html.
- * If authenticated, renders the user greeting and logout button in the header.
- */
+// Simple local login check used by all pages.
 export function checkAuth() {
   const user = localStorage.getItem('user');
   const onLoginPage = window.location.pathname.endsWith('login.html');
@@ -27,11 +20,8 @@ export function checkAuth() {
   renderUserProfile(user);
 }
 
-/**
- * Renders the user profile widget in the header.
- *
- * @param {string} userName
- */
+// Header profile widget
+
 function renderUserProfile(userName) {
   const headerInner = document.querySelector('.site-header__inner');
   if (!headerInner) return;

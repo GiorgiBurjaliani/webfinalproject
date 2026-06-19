@@ -1,9 +1,5 @@
-/**
- * ui.js
- * DOM-creation functions for OpportunityHub.
- * Every function creates elements with document.createElement — no innerHTML
- * is used for untrusted API content.
- */
+// This file has small UI helper functions.
+// Most elements are created with JavaScript instead of writing HTML strings.
 
 import {
   formatDate,
@@ -16,17 +12,9 @@ import {
 } from './utils.js';
 import { isOpportunitySaved } from './storage.js';
 
-// ---------------------------------------------------------------------------
-// Status / feedback elements
-// ---------------------------------------------------------------------------
+// Status and empty states
 
-/**
- * Shows a status message in a given container element.
- *
- * @param {HTMLElement} container - Element with role="status" and aria-live.
- * @param {string} text           - Message text to display.
- * @param {string} type           - 'error' | 'info' | 'success' | 'warning'
- */
+// Shows a message like loading, error, or success.
 export function showStatusMessage(container, text, type = 'info') {
   if (!container) return;
   container.textContent = '';
@@ -35,11 +23,7 @@ export function showStatusMessage(container, text, type = 'info') {
   container.hidden = false;
 }
 
-/**
- * Hides and clears a status message container.
- *
- * @param {HTMLElement} container
- */
+// Clears the status message when it is no longer needed.
 export function clearStatusMessage(container) {
   if (!container) return;
   container.hidden = true;
@@ -47,13 +31,8 @@ export function clearStatusMessage(container) {
   container.className = 'status-message';
 }
 
-/**
- * Shows a loading spinner / text inside a container.
- *
- * @param {HTMLElement} container
- * @param {string} text
- */
-export function showLoading(container, text = 'Loading opportunities…') {
+// Creates the loading spinner and text.
+export function showLoading(container, text = 'Loading opportunities...') {
   if (!container) return;
   container.textContent = '';
 
@@ -73,13 +52,7 @@ export function showLoading(container, text = 'Loading opportunities…') {
   container.appendChild(wrap);
 }
 
-/**
- * Shows an empty-state message inside a grid container.
- *
- * @param {HTMLElement} container
- * @param {string} heading
- * @param {string} body
- */
+// Used when there are no cards to show.
 export function showEmptyState(container, heading = 'No opportunities found', body = 'Try adjusting your search or filters.') {
   if (!container) return;
   container.textContent = '';
@@ -101,44 +74,34 @@ export function showEmptyState(container, heading = 'No opportunities found', bo
   container.appendChild(wrap);
 }
 
-// ---------------------------------------------------------------------------
-// Opportunity card
-// ---------------------------------------------------------------------------
+// Opportunity cards
 
-/**
- * Creates a single opportunity card as a DOM element.
- * All content is set via textContent to prevent XSS.
- *
- * @param {object}   opportunity       - Normalized opportunity object.
- * @param {Function} onSaveToggle      - Callback(opportunity) called when save button is clicked.
- * @returns {HTMLElement} <article> element
- */
+// Builds one opportunity card from an opportunity object.
 export function createOpportunityCard(opportunity, onSaveToggle) {
   const card = document.createElement('article');
   card.className = 'opportunity-card';
   card.setAttribute('data-id', opportunity.id);
 
-  // --- Category badge ---
-  // --- Category badge ---
+  // Category is shown first so users can scan the card quickly.
   const catBadge = document.createElement('span');
   catBadge.className = `opportunity-card__category opportunity-card__category--${opportunity.category}`;
   catBadge.textContent = opportunity.categoryLabel || categoryLabel(opportunity.category);
 
-  // --- Demo / Verified badge ---
+  // Some cards are marked as verified or demo.
   let badgeEl = null;
   if (opportunity.isVerified) {
     badgeEl = document.createElement('span');
     badgeEl.className = 'badge badge--verified';
     badgeEl.textContent = 'Verified Opportunity';
-    badgeEl.style.marginLeft = '0.5rem';
+    badgeEl.classList.add('badge--spaced');
   } else if (opportunity.isDemo) {
     badgeEl = document.createElement('span');
     badgeEl.className = 'badge badge--demo';
     badgeEl.textContent = 'Demo Opportunity';
-    badgeEl.style.marginLeft = '0.5rem';
+    badgeEl.classList.add('badge--spaced');
   }
 
-  // --- Title ---
+  // The title links to the details page for this opportunity.
   const title = document.createElement('h2');
   title.className = 'opportunity-card__title';
   const titleLink = document.createElement('a');
@@ -147,17 +110,16 @@ export function createOpportunityCard(opportunity, onSaveToggle) {
   titleLink.textContent = opportunity.title;
   title.appendChild(titleLink);
 
-  // --- Organizer ---
+  // Short information shown before the action buttons.
   const organizer = document.createElement('p');
   organizer.className = 'opportunity-card__organizer';
   organizer.textContent = opportunity.organizer;
 
-  // --- Summary ---
   const summary = document.createElement('p');
   summary.className = 'opportunity-card__summary';
   summary.textContent = truncate(opportunity.summary, 140);
 
-  // --- Meta row ---
+  // The meta list keeps format, funding, and region in one row.
   const meta = document.createElement('ul');
   meta.className = 'opportunity-card__meta';
   meta.setAttribute('aria-label', 'Opportunity details');
@@ -166,7 +128,7 @@ export function createOpportunityCard(opportunity, onSaveToggle) {
   meta.appendChild(createMetaItem('Funding', fundingLabel(opportunity.funding)));
   meta.appendChild(createMetaItem('Region', opportunity.region !== 'not-specified' ? opportunity.region : 'Not specified'));
 
-  // --- Deadline ---
+  // Deadline has both the date and a small status badge.
   const deadlineRow = document.createElement('div');
   deadlineRow.className = 'opportunity-card__deadline-row';
 
@@ -188,7 +150,7 @@ export function createOpportunityCard(opportunity, onSaveToggle) {
   deadlineRow.appendChild(deadlineDate);
   deadlineRow.appendChild(deadlineStatus);
 
-  // --- Actions ---
+  // Action buttons for details, official link, and saving.
   const actions = document.createElement('div');
   actions.className = 'opportunity-card__actions';
 
@@ -224,7 +186,7 @@ export function createOpportunityCard(opportunity, onSaveToggle) {
     if (typeof onSaveToggle === 'function') {
       onSaveToggle(opportunity);
     }
-    // Refresh button state after toggle
+    // After saving/removing, update the button text right away.
     const nowSaved = isOpportunitySaved(opportunity.id);
     updateSaveButton(saveBtn, nowSaved);
     saveBtn.setAttribute('aria-label',
@@ -240,7 +202,7 @@ export function createOpportunityCard(opportunity, onSaveToggle) {
   }
   actions.appendChild(saveBtn);
 
-  // --- Assemble card ---
+  // Put all card parts together in the final order.
   card.appendChild(catBadge);
   if (badgeEl) {
     card.appendChild(badgeEl);
@@ -256,13 +218,7 @@ export function createOpportunityCard(opportunity, onSaveToggle) {
 
 }
 
-/**
- * Creates a single <li> meta item for the card meta list.
- *
- * @param {string} label
- * @param {string} value
- * @returns {HTMLElement}
- */
+// Makes one item inside the card's meta list.
 function createMetaItem(label, value) {
   const li = document.createElement('li');
   li.className = 'opportunity-card__meta-item';
@@ -280,18 +236,9 @@ function createMetaItem(label, value) {
   return li;
 }
 
-// ---------------------------------------------------------------------------
 // Grid rendering
-// ---------------------------------------------------------------------------
 
-/**
- * Renders an array of opportunities into the grid container.
- * Appends cards rather than replacing — supports Load More.
- *
- * @param {HTMLElement} grid          - Target grid container element.
- * @param {object[]}    opportunities - Array of normalized opportunity objects.
- * @param {Function}    onSaveToggle  - Save toggle callback passed to each card.
- */
+// Adds many cards into the grid.
 export function renderOpportunityGrid(grid, opportunities, onSaveToggle) {
   if (!grid) return;
 
@@ -306,22 +253,15 @@ export function renderOpportunityGrid(grid, opportunities, onSaveToggle) {
       const card = createOpportunityCard(opp, onSaveToggle);
       fragment.appendChild(card);
     } catch {
-      // One broken card must not prevent others from rendering.
+      // If one card has a problem, the other cards can still appear.
     }
   }
   grid.appendChild(fragment);
 }
 
-// ---------------------------------------------------------------------------
-// Save button helper
-// ---------------------------------------------------------------------------
+// Button and image helpers
 
-/**
- * Updates a save button's text and CSS class to reflect current saved state.
- *
- * @param {HTMLButtonElement} btn
- * @param {boolean}           saved
- */
+// Changes the Save button depending on whether the item is already saved.
 export function updateSaveButton(btn, saved) {
   if (!btn) return;
   if (saved) {
@@ -333,16 +273,7 @@ export function updateSaveButton(btn, saved) {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Placeholder image helper
-// ---------------------------------------------------------------------------
-
-/**
- * Returns the path to a local placeholder SVG for a given category.
- *
- * @param {string} category
- * @returns {string}
- */
+// Picks a local placeholder image when the real opportunity image is missing.
 export function getPlaceholderImage(category) {
   const map = {
     hackathon:          'assets/placeholder-hackathon.svg',

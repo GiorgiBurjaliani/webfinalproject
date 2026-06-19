@@ -1,10 +1,5 @@
-/**
- * main.js
- * Entry point for index.html — Opportunity Discovery page.
- * Coordinates API, filters, sorting, pagination, and dynamic card rendering.
- * Uses a debounced search input to optimize performance.
- */
-
+// Main script for the home page.
+// Here I load opportunities, filter them, sort them, and render the cards.
 
 import { fetchOpportunities } from './api.js';
 import { renderOpportunityGrid, showLoading, showEmptyState, showStatusMessage, clearStatusMessage } from './ui.js';
@@ -13,23 +8,17 @@ import { createDebounce, normalizeText, compareDeadlinesAsc, compareDeadlinesDes
 import { DEMO_OPPORTUNITIES } from './config.js';
 import { checkAuth } from './auth.js';
 
+// Application state
 
-// ---------------------------------------------------------------------------
-// Application State
-// ---------------------------------------------------------------------------
-
-/**
- * Central state object for the discovery page.
- * Must not contain DOM elements.
- */
+// I keep the current page data here so the filters and rendering can use it.
 const state = {
-  /** All opportunities fetched from the API across all pages. */
+  // All opportunities loaded so far.
   opportunities: [],
 
-  /** Opportunities after applying current filters and sort. */
+  // Same data after search, filters, and sorting.
   filteredOpportunities: [],
 
-  /** Current active filter values. */
+  // Default filter values.
   filters: {
     search: '',
     category: 'all',
@@ -40,20 +29,19 @@ const state = {
     sort: 'deadline-asc',
   },
 
-  /** Current API page number (1-based). */
+  // GitHub pages start from 1.
   currentPage: 1,
 
-  /** Whether a fetch is currently in progress. */
+  // This stops the app from starting two loads at the same time.
   isLoading: false,
 
-  /** Whether more results may be available from the API. */
+  // Used to decide if the Load More button should show.
   hasMore: true,
 };
 
-// ---------------------------------------------------------------------------
 // DOM references
-// ---------------------------------------------------------------------------
 
+// Main elements from the page.
 const grid          = document.getElementById('opportunity-grid');
 const statusMsg     = document.getElementById('status-message');
 const demoDataNotice = document.getElementById('demo-data-notice');
@@ -68,14 +56,9 @@ const datatypeSelect = document.getElementById('datatype-select');
 const sortSelect    = document.getElementById('sort-select');
 const resetBtn      = document.getElementById('reset-filters-btn');
 
-// ---------------------------------------------------------------------------
-// Filter & Sort logic
-// ---------------------------------------------------------------------------
+// Filter and sort
 
-/**
- * Applies current state.filters to state.opportunities,
- * writes the result to state.filteredOpportunities.
- */
+// Verified opportunities are shown first when other sorting values are equal.
 function tieBreaker(a, b) {
   const aScore = a.isVerified ? 2 : (a.isDemo ? 0 : 1);
   const bScore = b.isVerified ? 2 : (b.isDemo ? 0 : 1);
@@ -87,7 +70,7 @@ function applyFilters() {
   const searchTerm = normalizeText(search);
 
   let result = state.opportunities.filter((opp) => {
-    // Search: match against title, organizer, summary, description
+    // Search checks the main text fields of an opportunity.
     if (searchTerm.length >= 2) {
       const haystack = normalizeText(
         `${opp.title} ${opp.organizer} ${opp.summary} ${opp.description}`
@@ -95,19 +78,13 @@ function applyFilters() {
       if (!haystack.includes(searchTerm)) return false;
     }
 
-    // Category filter
+    // Each dropdown removes items that do not match the selected value.
     if (category !== 'all' && opp.category !== category) return false;
-
-    // Format filter
     if (format !== 'all' && opp.format !== format) return false;
-
-    // Funding filter
     if (funding !== 'all' && opp.funding !== funding) return false;
-
-    // Region filter
     if (region !== 'all' && opp.region !== region) return false;
 
-    // Datatype filter
+    // This one separates verified, demo, and GitHub issue data.
     if (datatype !== 'all') {
       if (datatype === 'verified' && !opp.isVerified) return false;
       if (datatype === 'demo' && !opp.isDemo) return false;
@@ -116,7 +93,7 @@ function applyFilters() {
     return true;
   });
 
-  // Sort
+  // Sort changes the order but not the actual saved data.
   switch (sort) {
     case 'deadline-asc':
       result = result.slice().sort((a, b) => {
@@ -154,18 +131,13 @@ function applyFilters() {
   state.filteredOpportunities = result;
 }
 
-// ---------------------------------------------------------------------------
 // Render
-// ---------------------------------------------------------------------------
 
-/**
- * Clears the grid and renders filteredOpportunities.
- * Called after every filter/sort change.
- */
+// Redraws the cards after loading, filtering, or sorting.
 function renderGrid() {
   if (!grid) return;
 
-  // Toggle global demo notice visibility based on loaded opportunities
+  // Show the demo notice only when demo data is actually visible in the app.
   if (demoDataNotice) {
     const hasDemo = state.opportunities.some((opp) => opp.isDemo);
     demoDataNotice.hidden = !hasDemo;
@@ -185,8 +157,7 @@ function renderGrid() {
       if (emptyDiv) {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'btn btn--primary';
-        btn.style.marginTop = '1.5rem';
+        btn.className = 'btn btn--primary empty-state__action';
         btn.textContent = 'Load Demo Opportunities (Testing)';
         btn.addEventListener('click', () => {
           state.opportunities = [...DEMO_OPPORTUNITIES];
@@ -209,14 +180,9 @@ function renderGrid() {
   renderOpportunityGrid(grid, state.filteredOpportunities, handleSaveToggle);
 }
 
-// ---------------------------------------------------------------------------
 // Data loading
-// ---------------------------------------------------------------------------
 
-/**
- * Fetches the next page of opportunities from the API and appends them to state.
- * Shows loading/error states appropriately.
- */
+// Loads the next group of opportunities from GitHub.
 async function loadOpportunities() {
   if (state.isLoading) return;
   state.isLoading = true;
@@ -228,13 +194,13 @@ async function loadOpportunities() {
     showLoading(grid);
   } else {
     loadMoreBtn.disabled = true;
-    loadMoreBtn.textContent = 'Loading…';
+    loadMoreBtn.textContent = 'Loading...';
   }
 
   try {
     const { opportunities, hasMore } = await fetchOpportunities(state.currentPage);
 
-    // De-duplicate by ID before appending (prevents Load More duplicates)
+    // Avoid adding the same card twice after pressing Load More.
     const existingIds = new Set(state.opportunities.map((o) => o.id));
     const newOpps = opportunities.filter((o) => !existingIds.has(o.id));
 
@@ -245,7 +211,7 @@ async function loadOpportunities() {
     applyFilters();
     renderGrid();
 
-    // Show/hide Load More button
+    // If there are more GitHub results, keep the Load More button.
     if (state.hasMore) {
       loadMoreWrap.hidden = false;
       loadMoreBtn.disabled = false;
@@ -254,9 +220,9 @@ async function loadOpportunities() {
       loadMoreWrap.hidden = true;
     }
 
-    // If the API returned items but filters reduced them to 0, still inform user
+    // If nothing loaded at all, tell the user what happened.
     if (state.opportunities.length === 0) {
-      showStatusMessage(statusMsg, 'No open opportunities found in this repository. You can add demo opportunities via GitHub Issues — see DATA_SETUP.md.', 'info');
+      showStatusMessage(statusMsg, 'No open opportunities found in this repository. You can add demo opportunities via GitHub Issues - see DATA_SETUP.md.', 'info');
     }
 
   } catch (error) {
@@ -268,7 +234,7 @@ async function loadOpportunities() {
     );
     showStatusMessage(statusMsg, error.message, 'error');
 
-    // Re-enable Load More so user can retry
+    // Let the user try again if loading failed on a later page.
     if (state.currentPage > 1) {
       loadMoreBtn.disabled = false;
       loadMoreBtn.textContent = 'Retry';
@@ -278,15 +244,9 @@ async function loadOpportunities() {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Save/Remove toggle
-// ---------------------------------------------------------------------------
+// Save button
 
-/**
- * Handles the Save / Remove Saved button click on any opportunity card.
- *
- * @param {object} opportunity - Normalized opportunity object.
- */
+// Saves or removes one opportunity when the card button is clicked.
 function handleSaveToggle(opportunity) {
   if (isOpportunitySaved(opportunity.id)) {
     removeSavedOpportunity(opportunity.id);
@@ -298,18 +258,13 @@ function handleSaveToggle(opportunity) {
     }
   }
 
-  // Auto-hide message after 3 seconds
+  // Hide the small message after a few seconds.
   setTimeout(() => clearStatusMessage(statusMsg), 3000);
 }
 
-// ---------------------------------------------------------------------------
-// Filter change handlers (each has one clear responsibility)
-// ---------------------------------------------------------------------------
+// Filter controls
 
-/**
- * Reads all filter select values into state.filters and re-renders.
- * Called on every filter change event.
- */
+// Reads the current dropdown values and applies them.
 function handleFilterChange() {
   state.filters.category = categorySelect ? categorySelect.value : 'all';
   state.filters.format   = formatSelect   ? formatSelect.value   : 'all';
@@ -323,10 +278,7 @@ function handleFilterChange() {
   saveLastFilters(state.filters);
 }
 
-/**
- * Handles search input changes — debounced to avoid re-filtering on every keystroke.
- * This is the inner function returned by createDebounce().
- */
+// Debounce means the search waits a little while the user is typing.
 const handleSearchInput = createDebounce((event) => {
   state.filters.search = event.target ? event.target.value : '';
   applyFilters();
@@ -334,9 +286,7 @@ const handleSearchInput = createDebounce((event) => {
   saveLastFilters(state.filters);
 }, 350);
 
-/**
- * Resets all filters to default values and re-renders.
- */
+// Puts all filters back to their starting values.
 function handleResetFilters() {
   state.filters = {
     search:   '',
@@ -361,21 +311,15 @@ function handleResetFilters() {
   saveLastFilters(state.filters);
 }
 
-/**
- * Handles the Load More button click — loads the next API page.
- */
+// Loads another GitHub page when possible.
 function handleLoadMore() {
   if (!state.hasMore || state.isLoading) return;
   loadOpportunities();
 }
 
-// ---------------------------------------------------------------------------
-// Restore last-used filters from localStorage
-// ---------------------------------------------------------------------------
+// Saved filter settings
 
-/**
- * Restores filter select elements and state.filters from the last saved session.
- */
+// Brings back the user's last filter choices from localStorage.
 function restoreLastFilters() {
   const saved = getLastFilters();
   if (!saved || typeof saved !== 'object') return;
@@ -389,10 +333,9 @@ function restoreLastFilters() {
   if (saved.sort     && sortSelect)     { sortSelect.value     = saved.sort;     state.filters.sort     = saved.sort;     }
 }
 
-// ---------------------------------------------------------------------------
-// Event listener registration
-// ---------------------------------------------------------------------------
+// Register events and init
 
+// Connects buttons and inputs to their functions.
 function registerEventListeners() {
   if (searchInput)    searchInput.addEventListener('input', handleSearchInput);
   if (categorySelect) categorySelect.addEventListener('change', handleFilterChange);
@@ -405,10 +348,7 @@ function registerEventListeners() {
   if (loadMoreBtn)    loadMoreBtn.addEventListener('click', handleLoadMore);
 }
 
-// ---------------------------------------------------------------------------
-// Page initialization
-// ---------------------------------------------------------------------------
-
+// Starts the page after all functions are ready.
 function init() {
   checkAuth();
   restoreLastFilters();

@@ -4,8 +4,8 @@ import urllib.request
 import urllib.error
 import sys
 
-# List of 10 real, beautiful tech opportunities to populate the feed
-# Each opportunity includes the 'data:demo' label
+# Demo opportunities used to populate the feed during testing.
+# Each item gets the 'data:demo' label.
 OPPORTUNITIES = [
     {
         "title": "Tbilisi AI Student Hackathon 2025",
@@ -282,7 +282,7 @@ OPPORTUNITIES = [
 
 def main():
     print("====================================================")
-    print("  OpportunityHub — Create 10 Real GitHub Issues")
+    print("  OpportunityHub - Create 10 Demo GitHub Issues")
     print("====================================================")
     print("This script will create 10 real, structured tech opportunities")
     print("as Issues in your GitHub repository: GiorgiBurjaliani/webfinalproject.\n")

@@ -1,5 +1,7 @@
 import { checkAuth } from './auth.js';
 
+// Page setup
+
 // Check auth state on load. If the user is already logged in,
 // auth.js redirects this page to index.html.
 checkAuth();
@@ -7,6 +9,8 @@ checkAuth();
 const form = document.getElementById('login-form');
 const inputEl = document.getElementById('name-input');
 const errorEl = document.getElementById('login-error');
+
+// Login form
 
 function showLoginError(message) {
   if (errorEl) {

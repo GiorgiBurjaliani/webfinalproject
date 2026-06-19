@@ -590,6 +590,10 @@ main {
   margin-bottom: 1.5rem;
 }
 
+.empty-state__action {
+  margin-top: 1.5rem;
+}
+
 /* ===== opportunity-details page ===== */
 .details-back {
   margin-bottom: 1.5rem;
@@ -1129,6 +1133,10 @@ main {
   letter-spacing: 0.05em;
   display: inline-flex;
   align-items: center;
+}
+
+.badge--spaced {
+  margin-left: 0.5rem;
 }
 
 .placeholder-link-message {
