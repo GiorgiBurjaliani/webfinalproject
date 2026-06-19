@@ -11,6 +11,7 @@ import { renderOpportunityGrid, showLoading, showEmptyState, showStatusMessage, 
 import { saveOpportunity, removeSavedOpportunity, isOpportunitySaved, saveLastFilters, getLastFilters } from './storage.js';
 import { createDebounce, normalizeText, compareDeadlinesAsc, compareDeadlinesDesc } from './utils.js';
 import { DEMO_OPPORTUNITIES } from './config.js';
+import { checkAuth } from './auth.js';
 
 
 // ---------------------------------------------------------------------------
@@ -409,6 +410,7 @@ function registerEventListeners() {
 // ---------------------------------------------------------------------------
 
 function init() {
+  checkAuth();
   restoreLastFilters();
   registerEventListeners();
   loadOpportunities();
