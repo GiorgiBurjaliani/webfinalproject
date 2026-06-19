@@ -250,3 +250,58 @@ export function isPlaceholderUrl(url) {
   return false;
 }
 
+/**
+ * Checks if a URL points only to a general homepage (e.g. root path of a general organization/platform).
+ *
+ * @param {string} url
+ * @returns {boolean}
+ */
+export function isGeneralHomepageUrl(url) {
+  if (!url || typeof url !== 'string' || url.trim() === '') return true;
+  const clean = url.trim().toLowerCase();
+
+  // If it's a known placeholder
+  if (isPlaceholderUrl(clean)) return true;
+
+  try {
+    const parsed = new URL(clean);
+    const hostname = parsed.hostname.replace('www.', '');
+    const path = parsed.pathname === '/' ? '' : parsed.pathname;
+
+    // Check if the path is empty (just the domain root)
+    const isRoot = path === '' || path === '/';
+
+    // List of domains where the root is considered a general homepage
+    const generalDomains = [
+      'reddit.com',
+      'devpost.com',
+      'eiturbanmobility.eu',
+      'youthtbilisi.ge',
+      'github.com',
+      'tbilisi.gov.ge',
+      'facebook.com',
+      'twitter.com',
+      'instagram.com',
+      'linkedin.com',
+      'google.com',
+      'youtube.com'
+    ];
+
+    if (isRoot) {
+      // If it's a root URL on any of these domains/subdomains or general domains
+      if (generalDomains.some(d => hostname === d || hostname.endsWith('.' + d))) {
+        return true;
+      }
+    }
+
+    // Specific pages that are community/platform homepages rather than event pages
+    if (hostname === 'reddit.com' && (path.startsWith('/r/devvit') && path.split('/').length <= 3)) {
+      return true; // r/Devvit homepage itself
+    }
+
+  } catch {
+    return true; // invalid URL is considered general homepage/invalid
+  }
+
+  return false;
+}

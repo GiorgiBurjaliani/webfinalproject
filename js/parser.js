@@ -4,7 +4,7 @@
  * Single responsibility: data shape normalization.
  */
 
-import { normalizeText, categoryLabel, isPlaceholderUrl } from './utils.js';
+import { normalizeText, categoryLabel, isPlaceholderUrl, isGeneralHomepageUrl } from './utils.js';
 
 // ---------------------------------------------------------------------------
 // Label parser
@@ -172,29 +172,32 @@ export function parseOpportunityIssue(issue) {
   const imageUrlRaw = field(bodyFields, ['image url', 'image', 'banner', 'logo url'], '');
   const imageUrl = isValidUrl(imageUrlRaw) ? imageUrlRaw : '';
 
-  // Extract official URL — validate it looks like a URL.
-  const officialUrlRaw = field(bodyFields, [
-    'official url', 'url', 'website', 'link', 'apply', 'registration url',
-  ], '');
-  const officialUrl = isValidUrl(officialUrlRaw) ? officialUrlRaw : '';
-
   // Extract official source URL
   const officialSourceUrlRaw = field(bodyFields, [
     'official source url', 'official source', 'source url', 'source', 'official source website'
   ], '');
   const officialSourceUrl = isValidUrl(officialSourceUrlRaw) ? officialSourceUrlRaw : '';
 
+  // Extract official registration URL
+  const officialRegistrationUrlRaw = field(bodyFields, [
+    'official registration url', 'official registration', 'registration url', 'registration', 'apply url', 'apply', 'official url', 'url', 'website', 'link'
+  ], '');
+  const officialRegistrationUrl = isValidUrl(officialRegistrationUrlRaw) ? officialRegistrationUrlRaw : '';
+
   const verifiedOn = field(bodyFields, ['verified on', 'verified date', 'verification date'], 'Not specified');
 
   // Detect if the opportunity is demo data
   const hasDemoLabel = labels.some((lbl) => lbl.name && lbl.name === 'data:demo');
-  const isDemoUrl = isPlaceholderUrl(officialUrl);
+  const isDemoUrl = isPlaceholderUrl(officialRegistrationUrl || officialSourceUrl);
   const isDemoType = field(bodyFields, ['data type', 'type'], '').toLowerCase().includes('demo');
   const isDemo = hasDemoLabel || isDemoUrl || isDemoType;
 
   // Detect if the opportunity is verified real data
   const hasVerifiedLabel = labels.some((lbl) => lbl.name && lbl.name === 'data:verified');
-  const isVerified = hasVerifiedLabel && !!(officialSourceUrl && !isPlaceholderUrl(officialSourceUrl));
+  const isVerified = hasVerifiedLabel &&
+                     !!(officialSourceUrl && !isPlaceholderUrl(officialSourceUrl) && !isGeneralHomepageUrl(officialSourceUrl));
+
+  const officialUrl = officialRegistrationUrl || officialSourceUrl;
 
   return {
     id: issue.number,
@@ -215,6 +218,7 @@ export function parseOpportunityIssue(issue) {
     ageRequirement: field(bodyFields, ['age requirement', 'age', 'age limit', 'age restriction'], 'Not specified'),
     experience: field(bodyFields, ['experience', 'required experience', 'skill level', 'experience level'], 'Not specified'),
     officialUrl,
+    officialRegistrationUrl,
     imageUrl,
     summary: extractSummary(issue.body, bodyFields),
     description: field(bodyFields, ['description', 'about', 'about this opportunity', 'details', 'overview'], 'See the official page for full details.'),

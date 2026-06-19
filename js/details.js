@@ -6,7 +6,7 @@
 
 import { fetchOpportunityByNumber } from './api.js';
 import { saveOpportunity, removeSavedOpportunity, isOpportunitySaved } from './storage.js';
-import { formatDate, getDeadlineStatus, fundingLabel, formatLabel, categoryLabel, isPlaceholderUrl } from './utils.js';
+import { formatDate, getDeadlineStatus, fundingLabel, formatLabel, categoryLabel, isPlaceholderUrl, isGeneralHomepageUrl } from './utils.js';
 import { showStatusMessage, clearStatusMessage, updateSaveButton, getPlaceholderImage } from './ui.js';
 import { DEMO_OPPORTUNITIES } from './config.js';
 import { checkAuth } from './auth.js';
@@ -16,10 +16,12 @@ import { checkAuth } from './auth.js';
 // DOM references
 // ---------------------------------------------------------------------------
 
-const statusEl      = document.getElementById('details-status');
-const contentEl     = document.getElementById('details-content');
-const saveBtn       = document.getElementById('details-save-btn');
-const officialLink  = document.getElementById('details-official-link');
+const statusEl          = document.getElementById('details-status');
+const contentEl         = document.getElementById('details-content');
+const saveBtn           = document.getElementById('details-save-btn');
+const sourceLink        = document.getElementById('details-source-link');
+const registerLink      = document.getElementById('details-register-link');
+const registerMissingEl = document.getElementById('details-register-missing');
 
 // ---------------------------------------------------------------------------
 // Render helpers
@@ -132,24 +134,25 @@ function renderOpportunityDetails(opp) {
   const benefitsEl = document.getElementById('details-benefits');
   if (benefitsEl) benefitsEl.textContent = opp.benefits || 'Not specified';
 
-  // Official link / placeholder message logic
-  const existingPlaceholderMsg = document.getElementById('details-placeholder-msg');
-  if (existingPlaceholderMsg) {
-    existingPlaceholderMsg.remove();
+  // Official source link logic
+  if (sourceLink) {
+    if (opp.officialSourceUrl && !isPlaceholderUrl(opp.officialSourceUrl) && !isGeneralHomepageUrl(opp.officialSourceUrl)) {
+      sourceLink.href = opp.officialSourceUrl;
+      sourceLink.hidden = false;
+    } else {
+      sourceLink.hidden = true;
+    }
   }
 
-  if (officialLink) {
-    if (opp.officialUrl && !isPlaceholderUrl(opp.officialUrl)) {
-      officialLink.href = opp.officialUrl;
-      officialLink.hidden = false;
+  // Official registration link / missing message logic
+  if (registerLink && registerMissingEl) {
+    if (opp.officialRegistrationUrl && !isPlaceholderUrl(opp.officialRegistrationUrl)) {
+      registerLink.href = opp.officialRegistrationUrl;
+      registerLink.hidden = false;
+      registerMissingEl.hidden = true;
     } else {
-      officialLink.hidden = true;
-      // Add non-clickable text
-      const placeholderMsg = document.createElement('div');
-      placeholderMsg.id = 'details-placeholder-msg';
-      placeholderMsg.className = 'placeholder-link-message';
-      placeholderMsg.textContent = 'Official registration link unavailable for this demo record.';
-      officialLink.parentNode.insertBefore(placeholderMsg, officialLink);
+      registerLink.hidden = true;
+      registerMissingEl.hidden = false;
     }
   }
 
