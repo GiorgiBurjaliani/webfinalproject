@@ -8,6 +8,8 @@ import { fetchOpportunityByNumber } from './api.js';
 import { saveOpportunity, removeSavedOpportunity, isOpportunitySaved } from './storage.js';
 import { formatDate, getDeadlineStatus, fundingLabel, formatLabel, categoryLabel } from './utils.js';
 import { showStatusMessage, clearStatusMessage, updateSaveButton, getPlaceholderImage } from './ui.js';
+import { DEMO_OPPORTUNITIES } from './config.js';
+
 
 // ---------------------------------------------------------------------------
 // DOM references
@@ -174,6 +176,17 @@ async function loadAndRender() {
   // Show loading state
   showStatusMessage(statusEl, 'Loading opportunity details…', 'info');
 
+  // Check if it is a local demo opportunity
+  const demoOpp = DEMO_OPPORTUNITIES.find((opp) => opp.id === issueNumber);
+  if (demoOpp) {
+    clearStatusMessage(statusEl);
+    renderOpportunityDetails(demoOpp);
+    if (saveBtn) {
+      saveBtn.addEventListener('click', () => handleDetailsSaveToggle(demoOpp));
+    }
+    return;
+  }
+
   try {
     const opportunity = await fetchOpportunityByNumber(issueNumber);
     clearStatusMessage(statusEl);
@@ -187,6 +200,7 @@ async function loadAndRender() {
   } catch (error) {
     showStatusMessage(statusEl, error.message, 'error');
   }
+
 }
 
 loadAndRender();

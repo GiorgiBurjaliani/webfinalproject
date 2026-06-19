@@ -10,6 +10,8 @@ import { fetchOpportunities } from './api.js';
 import { renderOpportunityGrid, showLoading, showEmptyState, showStatusMessage, clearStatusMessage } from './ui.js';
 import { saveOpportunity, removeSavedOpportunity, isOpportunitySaved, saveLastFilters, getLastFilters } from './storage.js';
 import { createDebounce, normalizeText, compareDeadlinesAsc, compareDeadlinesDesc } from './utils.js';
+import { DEMO_OPPORTUNITIES } from './config.js';
+
 
 // ---------------------------------------------------------------------------
 // Application State
@@ -140,6 +142,21 @@ function renderGrid() {
         'No opportunities yet',
         'No open opportunities are available right now. Check back soon, or suggest one using the Suggest page.'
       );
+      
+      const emptyDiv = grid.querySelector('.empty-state');
+      if (emptyDiv) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn--primary';
+        btn.style.marginTop = '1.5rem';
+        btn.textContent = 'Load Demo Opportunities (Testing)';
+        btn.addEventListener('click', () => {
+          state.opportunities = [...DEMO_OPPORTUNITIES];
+          applyFilters();
+          renderGrid();
+        });
+        emptyDiv.appendChild(btn);
+      }
     } else {
       showEmptyState(
         grid,
@@ -149,6 +166,7 @@ function renderGrid() {
     }
     return;
   }
+
 
   renderOpportunityGrid(grid, state.filteredOpportunities, handleSaveToggle);
 }
