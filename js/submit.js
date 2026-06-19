@@ -6,6 +6,8 @@
 
 import { saveSuggestionDraft, getSuggestionDraft, clearSuggestionDraft, addSubmittedSuggestion } from './storage.js';
 import { showStatusMessage, clearStatusMessage } from './ui.js';
+import { checkAuth } from './auth.js';
+
 
 // ---------------------------------------------------------------------------
 // DOM references
@@ -326,6 +328,7 @@ function registerEventListeners() {
 }
 
 function init() {
+  checkAuth();
   restoreDraft();
   registerEventListeners();
 }

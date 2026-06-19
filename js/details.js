@@ -9,6 +9,7 @@ import { saveOpportunity, removeSavedOpportunity, isOpportunitySaved } from './s
 import { formatDate, getDeadlineStatus, fundingLabel, formatLabel, categoryLabel, isPlaceholderUrl } from './utils.js';
 import { showStatusMessage, clearStatusMessage, updateSaveButton, getPlaceholderImage } from './ui.js';
 import { DEMO_OPPORTUNITIES } from './config.js';
+import { checkAuth } from './auth.js';
 
 
 // ---------------------------------------------------------------------------
@@ -200,20 +201,12 @@ function handleDetailsSaveToggle(opportunity) {
  * and renders the full detail view.
  */
 async function loadAndRender() {
-  const params = new URLSearchParams(window.location.search);
-  const numberParam = params.get('number');
+  checkAuth();
 
-  // Validate the parameter
-  if (!numberParam || numberParam.trim() === '') {
-    showStatusMessage(
-      statusEl,
-      'No opportunity number provided. Please go back and select an opportunity.',
-      'error'
-    );
-    return;
-  }
-
+  const urlParams = new URLSearchParams(window.location.search);
+  const numberParam = urlParams.get('number');
   const issueNumber = parseInt(numberParam, 10);
+
   if (isNaN(issueNumber) || issueNumber < 1) {
     showStatusMessage(
       statusEl,

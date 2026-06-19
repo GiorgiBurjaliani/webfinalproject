@@ -13,6 +13,7 @@ import {
 } from './storage.js';
 import { formatDate, getDeadlineStatus, categoryLabel, fundingLabel, formatLabel, compareDeadlinesAsc, compareDeadlinesDesc, isPlaceholderUrl } from './utils.js';
 import { showStatusMessage, clearStatusMessage } from './ui.js';
+import { checkAuth } from './auth.js';
 
 // ---------------------------------------------------------------------------
 // Available application statuses
@@ -335,6 +336,7 @@ function registerEventListeners() {
 }
 
 function init() {
+  checkAuth();
   registerEventListeners();
   renderSavedOpportunities();
 }
