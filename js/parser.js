@@ -4,7 +4,7 @@
  * Single responsibility: data shape normalization.
  */
 
-import { normalizeText, categoryLabel } from './utils.js';
+import { normalizeText, categoryLabel, isPlaceholderUrl } from './utils.js';
 
 // ---------------------------------------------------------------------------
 // Label parser
@@ -178,6 +178,24 @@ export function parseOpportunityIssue(issue) {
   ], '');
   const officialUrl = isValidUrl(officialUrlRaw) ? officialUrlRaw : '';
 
+  // Extract official source URL
+  const officialSourceUrlRaw = field(bodyFields, [
+    'official source url', 'official source', 'source url', 'source', 'official source website'
+  ], '');
+  const officialSourceUrl = isValidUrl(officialSourceUrlRaw) ? officialSourceUrlRaw : '';
+
+  const verifiedOn = field(bodyFields, ['verified on', 'verified date', 'verification date'], 'Not specified');
+
+  // Detect if the opportunity is demo data
+  const hasDemoLabel = labels.some((lbl) => lbl.name && lbl.name === 'data:demo');
+  const isDemoUrl = isPlaceholderUrl(officialUrl);
+  const isDemoType = field(bodyFields, ['data type', 'type'], '').toLowerCase().includes('demo');
+  const isDemo = hasDemoLabel || isDemoUrl || isDemoType;
+
+  // Detect if the opportunity is verified real data
+  const hasVerifiedLabel = labels.some((lbl) => lbl.name && lbl.name === 'data:verified');
+  const isVerified = hasVerifiedLabel && !!(officialSourceUrl && !isPlaceholderUrl(officialSourceUrl));
+
   return {
     id: issue.number,
     issueNumber: issue.number,
@@ -204,6 +222,10 @@ export function parseOpportunityIssue(issue) {
     labels: labels.map((lbl) => lbl.name),
     issueUrl: issue.html_url || '',
     publishedAt: issue.created_at || '',
+    isDemo,
+    isVerified,
+    officialSourceUrl,
+    verifiedOn,
   };
 }
 

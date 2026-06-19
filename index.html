@@ -98,6 +98,14 @@
             </select>
           </div>
           <div class="opportunity-search__field">
+            <label for="datatype-select" class="opportunity-search__label">Data Type</label>
+            <select id="datatype-select" name="datatype" class="opportunity-search__select" aria-label="Filter by data type">
+              <option value="all">All opportunities</option>
+              <option value="verified">Verified opportunities</option>
+              <option value="demo">Demo opportunities</option>
+            </select>
+          </div>
+          <div class="opportunity-search__field">
             <label for="sort-select" class="opportunity-search__label">Sort by</label>
             <select id="sort-select" name="sort" class="opportunity-search__select" aria-label="Sort opportunities">
               <option value="deadline-asc">Deadline: nearest first</option>
@@ -115,6 +123,12 @@
 
     <section class="results-section" aria-labelledby="results-heading">
       <h2 id="results-heading" class="visually-hidden">Opportunity results</h2>
+
+      <!-- Demo Data Notice -->
+      <div id="demo-data-notice" class="demo-notice" role="status" aria-live="polite" hidden>
+        <p class="demo-notice__title">Demo Data Notice</p>
+        <p class="demo-notice__text">The opportunities displayed in this educational project are sample records stored as GitHub Issues. They are used to demonstrate real API integration and should not be treated as verified active events.</p>
+      </div>
 
       <div
         id="status-message"

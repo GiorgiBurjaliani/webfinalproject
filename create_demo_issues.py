@@ -5,10 +5,11 @@ import urllib.error
 import sys
 
 # List of 10 real, beautiful tech opportunities to populate the feed
+# Each opportunity includes the 'data:demo' label
 OPPORTUNITIES = [
     {
         "title": "Tbilisi AI Student Hackathon 2025",
-        "labels": ["category:hackathon", "format:hybrid", "funding:free", "region:georgia"],
+        "labels": ["category:hackathon", "format:hybrid", "funding:free", "region:georgia", "data:demo"],
         "body": (
             "**Organizer:** Google Developer Group Tbilisi\n"
             "**Format:** Hybrid\n"
@@ -36,7 +37,7 @@ OPPORTUNITIES = [
     },
     {
         "title": "Europe Summer Technology Camp 2025",
-        "labels": ["category:camp", "format:in-person", "funding:fully-funded", "region:europe"],
+        "labels": ["category:camp", "format:in-person", "funding:fully-funded", "region:europe", "data:demo"],
         "body": (
             "**Organizer:** EU Commission for Youth & Tech\n"
             "**Format:** In-person\n"
@@ -63,7 +64,7 @@ OPPORTUNITIES = [
     },
     {
         "title": "Global Cyber Security Challenge",
-        "labels": ["category:competition", "format:online", "funding:free", "region:worldwide"],
+        "labels": ["category:competition", "format:online", "funding:free", "region:worldwide", "data:demo"],
         "body": (
             "**Organizer:** MIT Cybersecurity Lab\n"
             "**Format:** Online\n"
@@ -90,7 +91,7 @@ OPPORTUNITIES = [
     },
     {
         "title": "Full-Stack Web Bootcamp 2025",
-        "labels": ["category:bootcamp", "format:online", "funding:paid", "region:georgia"],
+        "labels": ["category:bootcamp", "format:online", "funding:paid", "region:georgia", "data:demo"],
         "body": (
             "**Organizer:** Tech Academy Georgia\n"
             "**Format:** Online\n"
@@ -117,7 +118,7 @@ OPPORTUNITIES = [
     },
     {
         "title": "NASA Space Apps Challenge Tbilisi",
-        "labels": ["category:hackathon", "format:in-person", "funding:free", "region:georgia"],
+        "labels": ["category:hackathon", "format:in-person", "funding:free", "region:georgia", "data:demo"],
         "body": (
             "**Organizer:** NASA Space Apps Georgia\n"
             "**Format:** In-person\n"
@@ -144,7 +145,7 @@ OPPORTUNITIES = [
     },
     {
         "title": "AWS Cloud Practitioner Workshop",
-        "labels": ["category:workshop", "format:online", "funding:free", "region:worldwide"],
+        "labels": ["category:workshop", "format:online", "funding:free", "region:worldwide", "data:demo"],
         "body": (
             "**Organizer:** Amazon Web Services\n"
             "**Format:** Online\n"
@@ -171,7 +172,7 @@ OPPORTUNITIES = [
     },
     {
         "title": "Silicon Valley Startup Challenge",
-        "labels": ["category:startup-challenge", "format:hybrid", "funding:partially-funded", "region:worldwide"],
+        "labels": ["category:startup-challenge", "format:hybrid", "funding:partially-funded", "region:worldwide", "data:demo"],
         "body": (
             "**Organizer:** Y Combinator / TechStars Network\n"
             "**Format:** Hybrid\n"
@@ -198,7 +199,7 @@ OPPORTUNITIES = [
     },
     {
         "title": "EU Youth Leadership Summit 2025",
-        "labels": ["category:youth-program", "format:in-person", "funding:fully-funded", "region:europe"],
+        "labels": ["category:youth-program", "format:in-person", "funding:fully-funded", "region:europe", "data:demo"],
         "body": (
             "**Organizer:** European Youth Forum\n"
             "**Format:** In-person\n"
@@ -225,7 +226,7 @@ OPPORTUNITIES = [
     },
     {
         "title": "Caucasus Game Dev Competition",
-        "labels": ["category:competition", "format:hybrid", "funding:free", "region:georgia"],
+        "labels": ["category:competition", "format:hybrid", "funding:free", "region:georgia", "data:demo"],
         "body": (
             "**Organizer:** Georgia Game Developers Association\n"
             "**Format:** Hybrid\n"
@@ -252,7 +253,7 @@ OPPORTUNITIES = [
     },
     {
         "title": "Data Science & Machine Learning Camp",
-        "labels": ["category:ai-camp", "format:hybrid", "funding:partially-funded", "region:georgia"],
+        "labels": ["category:ai-camp", "format:hybrid", "funding:partially-funded", "region:georgia", "data:demo"],
         "body": (
             "**Organizer:** AI Georgia Association\n"
             "**Format:** Hybrid\n"
@@ -299,11 +300,67 @@ def main():
         
     owner = "GiorgiBurjaliani"
     repo = "webfinalproject"
-    url = f"https://api.github.com/repos/{owner}/{repo}/issues"
     
+    # 1. Fetch existing open issues to avoid duplicates
+    print("\nFetching existing issues for duplicate check...")
+    existing_titles = set()
+    page = 1
+    while True:
+        list_url = f"https://api.github.com/repos/{owner}/{repo}/issues?state=all&per_page=100&page={page}"
+        req = urllib.request.Request(list_url, method="GET")
+        req.add_header("Authorization", f"token {token}")
+        req.add_header("Accept", "application/vnd.github+json")
+        req.add_header("User-Agent", "OpportunityHub-Setup-Script")
+        try:
+            with urllib.request.urlopen(req) as res:
+                issues = json.loads(res.read().decode("utf-8"))
+                if not issues:
+                    break
+                for issue in issues:
+                    if "pull_request" not in issue:
+                        existing_titles.add(issue["title"].strip().lower())
+                if len(issues) < 100:
+                    break
+                page += 1
+        except Exception as e:
+            print(f"Warning: Could not fetch existing issues for duplicate check: {e}")
+            break
+
+    # 2. Create the data:demo label if it does not exist
+    print("\nEnsuring 'data:demo' label exists in the repository...")
+    label_url = f"https://api.github.com/repos/{owner}/{repo}/labels"
+    label_payload = {
+        "name": "data:demo",
+        "color": "64748b",
+        "description": "Educational demo data opportunity"
+    }
+    label_data = json.dumps(label_payload).encode("utf-8")
+    req = urllib.request.Request(label_url, data=label_data, method="POST")
+    req.add_header("Authorization", f"token {token}")
+    req.add_header("Accept", "application/vnd.github+json")
+    req.add_header("User-Agent", "OpportunityHub-Setup-Script")
+    req.add_header("Content-Type", "application/json")
+    try:
+        with urllib.request.urlopen(req) as res:
+            print("-> Successfully created 'data:demo' label on GitHub.")
+    except urllib.error.HTTPError as e:
+        if e.code == 422:
+            print("-> Label 'data:demo' already exists.")
+        else:
+            print(f"-> Warning: Could not ensure 'data:demo' label exists (HTTP {e.code})")
+    except Exception as e:
+        print(f"-> Warning: Could not ensure 'data:demo' label exists: {e}")
+
+    # 3. Create opportunities
+    url = f"https://api.github.com/repos/{owner}/{repo}/issues"
     success_count = 0
     
     for idx, opp in enumerate(OPPORTUNITIES, start=1):
+        normalized_title = opp["title"].strip().lower()
+        if normalized_title in existing_titles:
+            print(f"\n[{idx}/10] Skipped: opportunity '{opp['title']}' already exists.")
+            continue
+            
         print(f"\n[{idx}/10] Creating issue: '{opp['title']}'...")
         
         payload = {
@@ -337,7 +394,7 @@ def main():
             print(f"-> FAILED: {str(e)}")
             
     print("\n====================================================")
-    print(f"Done! Successfully created {success_count}/10 issues.")
+    print(f"Done! Successfully created {success_count} new issues.")
     print("Open http://localhost:8000/ to see them on your live feed!")
     print("====================================================")
 

@@ -6,7 +6,7 @@
 
 import { fetchOpportunityByNumber } from './api.js';
 import { saveOpportunity, removeSavedOpportunity, isOpportunitySaved } from './storage.js';
-import { formatDate, getDeadlineStatus, fundingLabel, formatLabel, categoryLabel } from './utils.js';
+import { formatDate, getDeadlineStatus, fundingLabel, formatLabel, categoryLabel, isPlaceholderUrl } from './utils.js';
 import { showStatusMessage, clearStatusMessage, updateSaveButton, getPlaceholderImage } from './ui.js';
 import { DEMO_OPPORTUNITIES } from './config.js';
 
@@ -51,6 +51,45 @@ function renderOpportunityDetails(opp) {
   setText('details-title', opp.title);
   setText('details-organizer', `Organized by: ${opp.organizer}`);
 
+  // Handle details notices (demo or verified) near the title
+  const existingNotice = document.getElementById('details-demo-notice-msg');
+  if (existingNotice) {
+    existingNotice.remove();
+  }
+  if (opp.isVerified) {
+    const notice = document.createElement('div');
+    notice.id = 'details-demo-notice-msg';
+    notice.className = 'details-verified-notice';
+    
+    const textSpan = document.createElement('span');
+    textSpan.textContent = `Opportunity information verified from the organizer’s official source on ${opp.verifiedOn || 'recent date'}. Always check the official page before applying. `;
+    notice.appendChild(textSpan);
+
+    if (opp.officialSourceUrl) {
+      const sourceLink = document.createElement('a');
+      sourceLink.href = opp.officialSourceUrl;
+      sourceLink.target = '_blank';
+      sourceLink.rel = 'noopener noreferrer';
+      sourceLink.textContent = 'View Official Source';
+      notice.appendChild(sourceLink);
+    }
+
+    const titleEl = document.getElementById('details-title');
+    if (titleEl && titleEl.parentNode) {
+      titleEl.parentNode.insertBefore(notice, titleEl.nextSibling);
+    }
+  } else if (opp.isDemo) {
+    const notice = document.createElement('div');
+    notice.id = 'details-demo-notice-msg';
+    notice.className = 'details-demo-notice';
+    notice.textContent = 'This is a sample opportunity created for educational demonstration. Dates, organizer details, and registration links may not represent an active real-world event.';
+    
+    const titleEl = document.getElementById('details-title');
+    if (titleEl && titleEl.parentNode) {
+      titleEl.parentNode.insertBefore(notice, titleEl.nextSibling);
+    }
+  }
+
   // Deadline status badge
   const { key, label } = getDeadlineStatus(opp.deadline);
   const deadlineBadge = document.getElementById('details-deadline-status');
@@ -92,13 +131,24 @@ function renderOpportunityDetails(opp) {
   const benefitsEl = document.getElementById('details-benefits');
   if (benefitsEl) benefitsEl.textContent = opp.benefits || 'Not specified';
 
-  // Official link — only show when a valid URL exists
+  // Official link / placeholder message logic
+  const existingPlaceholderMsg = document.getElementById('details-placeholder-msg');
+  if (existingPlaceholderMsg) {
+    existingPlaceholderMsg.remove();
+  }
+
   if (officialLink) {
-    if (opp.officialUrl) {
+    if (opp.officialUrl && !isPlaceholderUrl(opp.officialUrl)) {
       officialLink.href = opp.officialUrl;
       officialLink.hidden = false;
     } else {
       officialLink.hidden = true;
+      // Add non-clickable text
+      const placeholderMsg = document.createElement('div');
+      placeholderMsg.id = 'details-placeholder-msg';
+      placeholderMsg.className = 'placeholder-link-message';
+      placeholderMsg.textContent = 'Official registration link unavailable for this demo record.';
+      officialLink.parentNode.insertBefore(placeholderMsg, officialLink);
     }
   }
 

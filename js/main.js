@@ -35,6 +35,7 @@ const state = {
     format: 'all',
     funding: 'all',
     region: 'all',
+    datatype: 'all',
     sort: 'deadline-asc',
   },
 
@@ -54,6 +55,7 @@ const state = {
 
 const grid          = document.getElementById('opportunity-grid');
 const statusMsg     = document.getElementById('status-message');
+const demoDataNotice = document.getElementById('demo-data-notice');
 const loadMoreBtn   = document.getElementById('load-more-btn');
 const loadMoreWrap  = document.getElementById('load-more-container');
 const searchInput   = document.getElementById('search-input');
@@ -61,6 +63,7 @@ const categorySelect = document.getElementById('category-select');
 const formatSelect  = document.getElementById('format-select');
 const fundingSelect = document.getElementById('funding-select');
 const regionSelect  = document.getElementById('region-select');
+const datatypeSelect = document.getElementById('datatype-select');
 const sortSelect    = document.getElementById('sort-select');
 const resetBtn      = document.getElementById('reset-filters-btn');
 
@@ -72,8 +75,14 @@ const resetBtn      = document.getElementById('reset-filters-btn');
  * Applies current state.filters to state.opportunities,
  * writes the result to state.filteredOpportunities.
  */
+function tieBreaker(a, b) {
+  const aScore = a.isVerified ? 2 : (a.isDemo ? 0 : 1);
+  const bScore = b.isVerified ? 2 : (b.isDemo ? 0 : 1);
+  return bScore - aScore;
+}
+
 function applyFilters() {
-  const { search, category, format, funding, region, sort } = state.filters;
+  const { search, category, format, funding, region, datatype, sort } = state.filters;
   const searchTerm = normalizeText(search);
 
   let result = state.opportunities.filter((opp) => {
@@ -97,26 +106,47 @@ function applyFilters() {
     // Region filter
     if (region !== 'all' && opp.region !== region) return false;
 
+    // Datatype filter
+    if (datatype !== 'all') {
+      if (datatype === 'verified' && !opp.isVerified) return false;
+      if (datatype === 'demo' && !opp.isDemo) return false;
+    }
+
     return true;
   });
 
   // Sort
   switch (sort) {
     case 'deadline-asc':
-      result = result.slice().sort(compareDeadlinesAsc);
+      result = result.slice().sort((a, b) => {
+        const diff = compareDeadlinesAsc(a, b);
+        if (diff !== 0) return diff;
+        return tieBreaker(a, b);
+      });
       break;
     case 'deadline-desc':
-      result = result.slice().sort(compareDeadlinesDesc);
+      result = result.slice().sort((a, b) => {
+        const diff = compareDeadlinesDesc(a, b);
+        if (diff !== 0) return diff;
+        return tieBreaker(a, b);
+      });
       break;
     case 'recent':
-      result = result.slice().sort((a, b) =>
-        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-      );
+      result = result.slice().sort((a, b) => {
+        const diff = new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
+        if (diff !== 0) return diff;
+        return tieBreaker(a, b);
+      });
       break;
     case 'title-asc':
-      result = result.slice().sort((a, b) => a.title.localeCompare(b.title));
+      result = result.slice().sort((a, b) => {
+        const diff = a.title.localeCompare(b.title);
+        if (diff !== 0) return diff;
+        return tieBreaker(a, b);
+      });
       break;
     default:
+      result = result.slice().sort(tieBreaker);
       break;
   }
 
@@ -133,6 +163,13 @@ function applyFilters() {
  */
 function renderGrid() {
   if (!grid) return;
+
+  // Toggle global demo notice visibility based on loaded opportunities
+  if (demoDataNotice) {
+    const hasDemo = state.opportunities.some((opp) => opp.isDemo);
+    demoDataNotice.hidden = !hasDemo;
+  }
+
   grid.textContent = '';
 
   if (state.filteredOpportunities.length === 0) {
@@ -277,6 +314,7 @@ function handleFilterChange() {
   state.filters.format   = formatSelect   ? formatSelect.value   : 'all';
   state.filters.funding  = fundingSelect  ? fundingSelect.value  : 'all';
   state.filters.region   = regionSelect   ? regionSelect.value   : 'all';
+  state.filters.datatype = datatypeSelect ? datatypeSelect.value : 'all';
   state.filters.sort     = sortSelect     ? sortSelect.value     : 'deadline-asc';
 
   applyFilters();
@@ -305,6 +343,7 @@ function handleResetFilters() {
     format:   'all',
     funding:  'all',
     region:   'all',
+    datatype: 'all',
     sort:     'deadline-asc',
   };
 
@@ -313,6 +352,7 @@ function handleResetFilters() {
   if (formatSelect)   formatSelect.value  = 'all';
   if (fundingSelect)  fundingSelect.value = 'all';
   if (regionSelect)   regionSelect.value  = 'all';
+  if (datatypeSelect) datatypeSelect.value = 'all';
   if (sortSelect)     sortSelect.value    = 'deadline-asc';
 
   applyFilters();
@@ -344,6 +384,7 @@ function restoreLastFilters() {
   if (saved.format   && formatSelect)   { formatSelect.value   = saved.format;   state.filters.format   = saved.format;   }
   if (saved.funding  && fundingSelect)  { fundingSelect.value  = saved.funding;  state.filters.funding  = saved.funding;  }
   if (saved.region   && regionSelect)   { regionSelect.value   = saved.region;   state.filters.region   = saved.region;   }
+  if (saved.datatype && datatypeSelect) { datatypeSelect.value = saved.datatype; state.filters.datatype = saved.datatype; }
   if (saved.sort     && sortSelect)     { sortSelect.value     = saved.sort;     state.filters.sort     = saved.sort;     }
 }
 
@@ -357,6 +398,7 @@ function registerEventListeners() {
   if (formatSelect)   formatSelect.addEventListener('change', handleFilterChange);
   if (fundingSelect)  fundingSelect.addEventListener('change', handleFilterChange);
   if (regionSelect)   regionSelect.addEventListener('change', handleFilterChange);
+  if (datatypeSelect) datatypeSelect.addEventListener('change', handleFilterChange);
   if (sortSelect)     sortSelect.addEventListener('change', handleFilterChange);
   if (resetBtn)       resetBtn.addEventListener('click', handleResetFilters);
   if (loadMoreBtn)    loadMoreBtn.addEventListener('click', handleLoadMore);

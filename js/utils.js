@@ -225,3 +225,28 @@ export function formatLabel(key) {
   };
   return map[key] || capitalize(key) || 'See details';
 }
+
+/**
+ * Checks if a URL is a placeholder or demo link.
+ *
+ * @param {string} url
+ * @returns {boolean}
+ */
+export function isPlaceholderUrl(url) {
+  if (!url || typeof url !== 'string' || url.trim() === '') return true;
+  const clean = url.trim().toLowerCase();
+  
+  if (clean.includes('placeholder') || clean.includes('demo')) return true;
+
+  try {
+    const parsed = new URL(clean);
+    const hostname = parsed.hostname;
+    if (hostname === 'example.com' || hostname.endsWith('.example.com')) {
+      return true;
+    }
+  } catch {
+    return true; // invalid URL is considered a placeholder
+  }
+  return false;
+}
+

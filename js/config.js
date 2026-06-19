@@ -77,8 +77,9 @@ export const DEMO_OPPORTUNITIES = [
     summary: 'Join the largest student hackathon in the Caucasus region. Teams will have 48 hours to design and prototype web apps that solve community needs.',
     description: 'Join the largest student hackathon in the Caucasus region. Teams will have 48 hours to design, prototype, and pitch web applications that address community needs.\n\nMentorship is provided by industry experts.',
     benefits: 'Total prize pool of 10,000 GEL and internship offers.',
-    labels: ['category:hackathon', 'format:hybrid', 'funding:free', 'region:georgia'],
+    labels: ['category:hackathon', 'format:hybrid', 'funding:free', 'region:georgia', 'data:demo'],
     publishedAt: new Date().toISOString(),
+    isDemo: true,
   },
   {
     id: 1002,
@@ -103,8 +104,9 @@ export const DEMO_OPPORTUNITIES = [
     summary: 'A 10-day immersive camp in Berlin focusing on cybersecurity, blockchain, and green tech. Travel and lodging are fully covered.',
     description: 'A 10-day immersive camp in Berlin focusing on cybersecurity, blockchain, and green tech. Participants will engage in workshops, network with European tech leaders, and build sustainable projects.',
     benefits: 'Fully covered flights, accommodation, meals, and participation certificate.',
-    labels: ['category:camp', 'format:in-person', 'funding:fully-funded', 'region:europe'],
+    labels: ['category:camp', 'format:in-person', 'funding:fully-funded', 'region:europe', 'data:demo'],
     publishedAt: new Date().toISOString(),
+    isDemo: true,
   },
   {
     id: 1003,
@@ -129,8 +131,9 @@ export const DEMO_OPPORTUNITIES = [
     summary: 'An online capture-the-flag (CTF) competition. Compete individually or in teams of up to 4 to solve security puzzles and win cash prizes.',
     description: 'An online capture-the-flag (CTF) competition. Compete individually or in teams of up to 4 to solve security puzzles, cryptographic challenges, and reverse-engineering tasks.',
     benefits: '$15,000 prize pool, digital badges, and recruitment fast-track.',
-    labels: ['category:competition', 'format:online', 'funding:free', 'region:worldwide'],
+    labels: ['category:competition', 'format:online', 'funding:free', 'region:worldwide', 'data:demo'],
     publishedAt: new Date().toISOString(),
+    isDemo: true,
   },
   {
     id: 1004,
@@ -155,8 +158,9 @@ export const DEMO_OPPORTUNITIES = [
     summary: 'A comprehensive 6-month bootcamp covering HTML, CSS, JavaScript, React, Node.js, and SQL. Career mentoring and interview prep included.',
     description: 'A comprehensive 6-month bootcamp covering HTML, CSS, JavaScript, React, Node.js, and SQL. Features live online lectures, code reviews, and structured projects.',
     benefits: 'Job guarantee or money-back policy. Portfolio review and career consulting.',
-    labels: ['category:bootcamp', 'format:online', 'funding:paid', 'region:georgia'],
+    labels: ['category:bootcamp', 'format:online', 'funding:paid', 'region:georgia', 'data:demo'],
     publishedAt: new Date().toISOString(),
+    isDemo: true,
   }
 ];
 

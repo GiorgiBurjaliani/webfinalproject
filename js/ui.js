@@ -118,9 +118,24 @@ export function createOpportunityCard(opportunity, onSaveToggle) {
   card.setAttribute('data-id', opportunity.id);
 
   // --- Category badge ---
+  // --- Category badge ---
   const catBadge = document.createElement('span');
   catBadge.className = `opportunity-card__category opportunity-card__category--${opportunity.category}`;
   catBadge.textContent = opportunity.categoryLabel || categoryLabel(opportunity.category);
+
+  // --- Demo / Verified badge ---
+  let badgeEl = null;
+  if (opportunity.isVerified) {
+    badgeEl = document.createElement('span');
+    badgeEl.className = 'badge badge--verified';
+    badgeEl.textContent = 'Verified Opportunity';
+    badgeEl.style.marginLeft = '0.5rem';
+  } else if (opportunity.isDemo) {
+    badgeEl = document.createElement('span');
+    badgeEl.className = 'badge badge--demo';
+    badgeEl.textContent = 'Demo Opportunity';
+    badgeEl.style.marginLeft = '0.5rem';
+  }
 
   // --- Title ---
   const title = document.createElement('h2');
@@ -211,6 +226,9 @@ export function createOpportunityCard(opportunity, onSaveToggle) {
 
   // --- Assemble card ---
   card.appendChild(catBadge);
+  if (badgeEl) {
+    card.appendChild(badgeEl);
+  }
   card.appendChild(title);
   card.appendChild(organizer);
   card.appendChild(summary);
@@ -219,6 +237,7 @@ export function createOpportunityCard(opportunity, onSaveToggle) {
   card.appendChild(actions);
 
   return card;
+
 }
 
 /**

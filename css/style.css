@@ -1085,3 +1085,105 @@ main {
     text-align: center;
   }
 }
+
+/* ===== Demo Data Styles ===== */
+.demo-notice {
+  background-color: rgba(99, 102, 241, 0.08);
+  border: 1px dashed var(--primary);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.demo-notice__title {
+  color: var(--text-primary);
+  font-family: var(--font-family-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.demo-notice__text {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.badge--demo {
+  background-color: var(--border-hover);
+  color: var(--text-secondary);
+  border: 1px solid var(--text-muted);
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+}
+
+.placeholder-link-message {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+}
+
+.details-demo-notice {
+  background-color: rgba(99, 102, 241, 0.05);
+  border-left: 4px solid var(--primary);
+  padding: 0.75rem 1.25rem;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.badge--verified {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--success);
+  border: 1px solid var(--success);
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+}
+
+.details-verified-notice {
+  background-color: rgba(16, 185, 129, 0.05);
+  border-left: 4px solid var(--success);
+  padding: 0.75rem 1.25rem;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.details-verified-notice a {
+  color: var(--success);
+  text-decoration: underline;
+  font-weight: 500;
+  margin-left: 0.25rem;
+}
+
+.details-verified-notice a:hover {
+  color: #34d399;
+}
+

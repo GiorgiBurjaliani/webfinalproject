@@ -11,7 +11,7 @@ import {
   getStatusForOpportunity,
   updateOpportunityStatus,
 } from './storage.js';
-import { formatDate, getDeadlineStatus, categoryLabel, fundingLabel, formatLabel, compareDeadlinesAsc, compareDeadlinesDesc } from './utils.js';
+import { formatDate, getDeadlineStatus, categoryLabel, fundingLabel, formatLabel, compareDeadlinesAsc, compareDeadlinesDesc, isPlaceholderUrl } from './utils.js';
 import { showStatusMessage, clearStatusMessage } from './ui.js';
 
 // ---------------------------------------------------------------------------
@@ -72,6 +72,20 @@ function createSavedCard(opp) {
   const catBadge = document.createElement('span');
   catBadge.className = `opportunity-card__category opportunity-card__category--${opp.category}`;
   catBadge.textContent = opp.categoryLabel || categoryLabel(opp.category);
+
+  // Demo / Verified badge
+  let badgeEl = null;
+  if (opp.isVerified) {
+    badgeEl = document.createElement('span');
+    badgeEl.className = 'badge badge--verified';
+    badgeEl.textContent = 'Verified Opportunity';
+    badgeEl.style.marginLeft = '0.5rem';
+  } else if (opp.isDemo) {
+    badgeEl = document.createElement('span');
+    badgeEl.className = 'badge badge--demo';
+    badgeEl.textContent = 'Demo Opportunity';
+    badgeEl.style.marginLeft = '0.5rem';
+  }
 
   // Title as link to details
   const titleEl = document.createElement('h2');
@@ -175,6 +189,9 @@ function createSavedCard(opp) {
 
   // Assemble
   article.appendChild(catBadge);
+  if (badgeEl) {
+    article.appendChild(badgeEl);
+  }
   article.appendChild(titleEl);
   article.appendChild(organizerEl);
   article.appendChild(metaEl);
