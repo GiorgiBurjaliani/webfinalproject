@@ -1,35 +1,59 @@
 import { checkAuth } from './auth.js';
 
-// Check auth state on load (redirects to index.html if already logged in)
+// Check auth state on load. If the user is already logged in,
+// auth.js redirects this page to index.html.
 checkAuth();
 
-document.getElementById('login-form').addEventListener('submit', (e) => {
-  e.preventDefault();
+const form = document.getElementById('login-form');
+const inputEl = document.getElementById('name-input');
+const errorEl = document.getElementById('login-error');
 
-  const inputEl = document.getElementById('name-input');
-  const name = inputEl.value.trim();
-  const errorEl = document.getElementById('login-error');
-
-  if (!name) {
-    errorEl.textContent = 'გთხოვთ შეიყვანოთ სახელი.';
+function showLoginError(message) {
+  if (errorEl) {
+    errorEl.textContent = message;
     errorEl.hidden = false;
+  }
+  if (inputEl) {
     inputEl.classList.add('form-field__input--error');
+  }
+}
+
+function clearLoginError() {
+  if (errorEl) {
+    errorEl.textContent = '';
+    errorEl.hidden = true;
+  }
+  if (inputEl) {
+    inputEl.classList.remove('form-field__input--error');
+  }
+}
+
+function handleLoginSubmit(event) {
+  event.preventDefault();
+
+  const name = inputEl ? inputEl.value.trim() : '';
+  if (!name) {
+    showLoginError('Please enter your name.');
     return;
   }
 
   if (name.length < 2) {
-    errorEl.textContent = 'სახელი უნდა შედგებოდეს მინიმუმ 2 სიმბოლოსგან.';
-    errorEl.hidden = false;
-    inputEl.classList.add('form-field__input--error');
+    showLoginError('Name must be at least 2 characters.');
     return;
   }
 
-  errorEl.hidden = true;
-  inputEl.classList.remove('form-field__input--error');
+  clearLoginError();
 
-  // Save user name and set authorized cookie
-  localStorage.setItem('user', name);
-  document.cookie = 'authorized=true; path=/;';
+  try {
+    localStorage.setItem('user', name);
+  } catch {
+    showLoginError('Your browser blocked local storage. Please enable it and try again.');
+    return;
+  }
 
-  window.location.href = 'index.html';
-});
+  window.location.assign(new URL('index.html', window.location.href));
+}
+
+if (form) {
+  form.addEventListener('submit', handleLoginSubmit);
+}

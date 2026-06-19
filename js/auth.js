@@ -10,22 +10,20 @@
  */
 export function checkAuth() {
   const user = localStorage.getItem('user');
+  const onLoginPage = window.location.pathname.endsWith('login.html');
 
-  // If on login page and already logged in, redirect to index
-  if (window.location.pathname.endsWith('login.html')) {
+  if (onLoginPage) {
     if (user) {
-      window.location.href = 'index.html';
+      window.location.assign(new URL('index.html', window.location.href));
     }
     return;
   }
 
-  // If not on login page and not logged in, redirect to login
   if (!user) {
-    window.location.href = 'login.html';
+    window.location.assign(new URL('login.html', window.location.href));
     return;
   }
 
-  // If logged in, inject the user profile UI into the header
   renderUserProfile(user);
 }
 
@@ -38,7 +36,6 @@ function renderUserProfile(userName) {
   const headerInner = document.querySelector('.site-header__inner');
   if (!headerInner) return;
 
-  // Prevent duplicate rendering
   if (document.getElementById('user-profile-widget')) return;
 
   const profileDiv = document.createElement('div');
@@ -47,7 +44,7 @@ function renderUserProfile(userName) {
 
   const greetingSpan = document.createElement('span');
   greetingSpan.className = 'user-profile__greeting';
-  greetingSpan.textContent = 'გამარჯობა, ';
+  greetingSpan.textContent = 'Hello, ';
 
   const nameStrong = document.createElement('strong');
   nameStrong.className = 'user-profile__name';
@@ -60,13 +57,11 @@ function renderUserProfile(userName) {
   logoutBtn.id = 'logout-btn';
   logoutBtn.type = 'button';
   logoutBtn.className = 'user-profile__logout-btn';
-  logoutBtn.textContent = 'გამოსვლა';
+  logoutBtn.textContent = 'Log out';
 
   logoutBtn.addEventListener('click', () => {
-    // Clear user session
     localStorage.removeItem('user');
-    document.cookie = 'authorized=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    window.location.href = 'login.html';
+    window.location.assign(new URL('login.html', window.location.href));
   });
 
   profileDiv.appendChild(greetingSpan);
