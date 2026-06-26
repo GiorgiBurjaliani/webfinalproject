@@ -4,6 +4,12 @@ OpportunityHub is a static front-end web application for discovering student tec
 
 The project is built with semantic HTML5, external CSS, and modular vanilla JavaScript. It uses the GitHub Issues REST API as a simple read-only data source.
 
+## Live Demo
+
+You can access the deployed application here:
+[OpportunityHub Live Demo](https://6a3dee55376d4f30639da8b3--steady-crepe-64acd0.netlify.app/login.html)
+
+
 ## Features
 
 1. Opportunity discovery
